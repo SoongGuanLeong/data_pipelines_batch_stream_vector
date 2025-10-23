@@ -1,0 +1,4 @@
+datasets/
+docker/connect-plugins
+docker/.env
+docker/keys/gcs-key.json

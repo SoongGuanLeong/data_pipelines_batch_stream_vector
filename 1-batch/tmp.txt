@@ -1,0 +1,5 @@
+curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d @sqlserver-connector.json
+
+
+
+docker exec -it kafka1 kafka-topics --list --bootstrap-server kafka1:29092
