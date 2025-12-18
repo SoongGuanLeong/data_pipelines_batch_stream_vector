@@ -9,4 +9,4 @@ This repository documents my learning journey in building three core types of da
 ## Current progress
 - batch pipeline
     - dataset: [AdventureWorks sample databases](https://learn.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver17&tabs=ssms)
-    - OLTP (MSSQL) → Debezium → Kafka + Schema Registry → (attempting iceberg kafka sink connector → Minio)
+    - OLTP (MSSQL) → OLTP (postgresql) → Debezium → Kafka + Schema Registry → (attempting iceberg kafka sink connector → Minio)
