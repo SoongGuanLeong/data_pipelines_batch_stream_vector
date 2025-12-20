@@ -14,4 +14,4 @@ OLTP (postgresql) → Debezium → Kafka + Schema Registry → (attempting icebe
 
 #### Tools used
 - [PostgreSQL](https://www.postgresql.org/download/)
-- 
+
