@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS oltp.customers (
     customer_id VARCHAR PRIMARY KEY,
     customer_unique_id VARCHAR,
-    customer_zip_code_prefix VARCHAR REFERENCES oltp.geolocations(geolocation_zip_code_prefix),
+    customer_zip_code_prefix VARCHAR,
     customer_city VARCHAR,
     customer_state VARCHAR,
     created_at TIMESTAMP DEFAULT NOW(),
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS oltp.geolocations (
 -- Sellers
 CREATE TABLE IF NOT EXISTS oltp.sellers (
     seller_id VARCHAR PRIMARY KEY,
-    seller_zip_code_prefix VARCHAR REFERENCES oltp.geolocations(geolocation_zip_code_prefix),
+    seller_zip_code_prefix VARCHAR,
     seller_city VARCHAR,
     seller_state VARCHAR,
     created_at TIMESTAMP DEFAULT NOW(),
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS oltp.product_categories (
 -- Products
 CREATE TABLE IF NOT EXISTS oltp.products (
     product_id VARCHAR PRIMARY KEY,
-    product_category_name VARCHAR REFERENCES oltp.product_categories(product_category_name),
+    product_category_name VARCHAR,
     product_name_length INT,
     product_description_length INT,
     product_photos_qty INT,
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS oltp.products (
 -- Orders
 CREATE TABLE IF NOT EXISTS oltp.orders (
     order_id VARCHAR PRIMARY KEY,
-    customer_id VARCHAR REFERENCES oltp.customers(customer_id),
+    customer_id VARCHAR,
     order_status VARCHAR,
     order_purchase_timestamp TIMESTAMP,
     order_approved_at TIMESTAMP,
@@ -65,10 +65,10 @@ CREATE TABLE IF NOT EXISTS oltp.orders (
 
 -- Order Items
 CREATE TABLE IF NOT EXISTS oltp.order_items (
-    order_id VARCHAR REFERENCES oltp.orders(order_id),
+    order_id VARCHAR,
     order_item_id INT,
-    product_id VARCHAR REFERENCES oltp.products(product_id),
-    seller_id VARCHAR REFERENCES oltp.sellers(seller_id),
+    product_id VARCHAR,
+    seller_id VARCHAR,
     shipping_limit_date TIMESTAMP,
     price NUMERIC,
     freight_value NUMERIC,
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS oltp.order_items (
 
 -- Payments
 CREATE TABLE IF NOT EXISTS oltp.order_payments (
-    order_id VARCHAR REFERENCES oltp.orders(order_id),
+    order_id VARCHAR,
     payment_sequential INT,
     payment_type VARCHAR,
     payment_installments INT,
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS oltp.order_payments (
 -- Reviews
 CREATE TABLE IF NOT EXISTS oltp.order_reviews (
     review_id VARCHAR PRIMARY KEY,
-    order_id VARCHAR REFERENCES oltp.orders(order_id),
+    order_id VARCHAR,
     review_score INT,
     review_comment_title VARCHAR,
     review_comment_message TEXT,
