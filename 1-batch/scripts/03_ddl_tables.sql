@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS oltp.customers (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Geolocations
-CREATE TABLE IF NOT EXISTS oltp.geolocations (
+-- Geolocations (optional enrichment)
+CREATE TABLE IF NOT EXISTS oltp.geolocations_enrichment (
     geolocation_zip_code_prefix VARCHAR PRIMARY KEY,
     geolocation_lat NUMERIC,
     geolocation_lng NUMERIC,
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS oltp.order_items (
     PRIMARY KEY(order_id, order_item_id)
 );
 
--- Payments
+-- Order Payments
 CREATE TABLE IF NOT EXISTS oltp.order_payments (
     order_id VARCHAR,
     payment_sequential INT,
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS oltp.order_payments (
     PRIMARY KEY(order_id, payment_sequential)
 );
 
--- Reviews
+-- Order Reviews
 CREATE TABLE IF NOT EXISTS oltp.order_reviews (
     review_id VARCHAR PRIMARY KEY,
     order_id VARCHAR,
