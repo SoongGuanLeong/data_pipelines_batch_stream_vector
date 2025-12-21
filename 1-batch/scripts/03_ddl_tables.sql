@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS oltp.customers (
 
 -- Geolocations (optional enrichment)
 CREATE TABLE IF NOT EXISTS oltp.geolocations_enrichment (
-    geolocation_zip_code_prefix VARCHAR PRIMARY KEY,
+    geolocation_zip_code_prefix VARCHAR,
     geolocation_lat NUMERIC,
     geolocation_lng NUMERIC,
     geolocation_city VARCHAR,
