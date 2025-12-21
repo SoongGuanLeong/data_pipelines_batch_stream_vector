@@ -5,11 +5,11 @@
 --------------------------------------------------------
 -- Geolocation (probably dirty & hence not indexed)
 --------------------------------------------------------
-CREATE INDEX idx_customers_zip_code
-ON oltp.customers (customer_zip_code_prefix);
+-- CREATE INDEX idx_customers_zip_code
+-- ON oltp.customers (customer_zip_code_prefix);
 
-CREATE INDEX idx_sellers_zip_code
-ON oltp.sellers (seller_zip_code_prefix);
+-- CREATE INDEX idx_sellers_zip_code
+-- ON oltp.sellers (seller_zip_code_prefix);
 
 --------------------------------------------------------
 -- products - product_categories

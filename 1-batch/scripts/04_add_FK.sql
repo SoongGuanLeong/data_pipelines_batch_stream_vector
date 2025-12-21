@@ -1,16 +1,17 @@
--- Geolocation is probably dirty / duplicated / enrichment (two FKs below might be deleted)
+-- Geolocation is probably dirty / duplicated / enrichment 
+-- (two FKs below might not work and can be removed)
 
--- customers - geolocations_enrichment
-ALTER TABLE oltp.customers
-    ADD CONSTRAINT fk_customer_zip_code
-    FOREIGN KEY (customer_zip_code_prefix) 
-    REFERENCES oltp.geolocations_enrichment(geolocation_zip_code_prefix);
+-- -- customers - geolocations_enrichment
+-- ALTER TABLE oltp.customers
+--     ADD CONSTRAINT fk_customer_zip_code
+--     FOREIGN KEY (customer_zip_code_prefix) 
+--     REFERENCES oltp.geolocations_enrichment(geolocation_zip_code_prefix);
 
--- sellers - geolocations_enrichment
-ALTER TABLE oltp.sellers
-    ADD CONSTRAINT fk_seller_zip_code 
-    FOREIGN KEY (seller_zip_code_prefix) 
-    REFERENCES oltp.geolocations_enrichment(geolocation_zip_code_prefix);
+-- -- sellers - geolocations_enrichment
+-- ALTER TABLE oltp.sellers
+--     ADD CONSTRAINT fk_seller_zip_code 
+--     FOREIGN KEY (seller_zip_code_prefix) 
+--     REFERENCES oltp.geolocations_enrichment(geolocation_zip_code_prefix);
 
 -- products - product_categories
 ALTER TABLE oltp.products
