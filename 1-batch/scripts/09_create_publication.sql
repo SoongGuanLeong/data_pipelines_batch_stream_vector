@@ -16,3 +16,5 @@ CREATE PUBLICATION olist_pub FOR TABLE
     oltp.order_items, 
     oltp.order_payments, 
     oltp.order_reviews;
+
+-- run the docker compose file after this
