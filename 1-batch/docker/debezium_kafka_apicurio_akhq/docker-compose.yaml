@@ -1,0 +1,115 @@
+# Olist Data Pipeline: Debezium 3.4 (3.4.0) + KRaft (3.4.0) + Apicurio (3.1.6) + AKHQ 
+name: olist-modern-stack
+
+services:
+  # 1. Kafka (KRaft mode - no Zookeeper)
+  kafka:
+    image: quay.io/debezium/kafka:3.4
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      # https://debezium.io/documentation/reference/tutorial.html
+      # https://kafka.apache.org/41/configuration/
+      - CLUSTER_ID=1yTur6oEQsOG-TbWZFCK-w  # docker run --rm quay.io/debezium/kafka:3.4 bash -c "bin/kafka-storage.sh random-uuid"
+      - NODE_ID=1
+      - NODE_ROLE=combined  # (combined / broker / controller)
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093  # 3 nodes would be: 1@kafka1:9093,2@kafka2:9093,3@kafka3:9093
+      # https://www.confluent.io/blog/kafka-listeners-explained/
+      # https://kafka.apache.org/41/operations/kraft/
+      - KAFKA_LISTENERS=EXTERNAL://:9092,INTERNAL://:29092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=EXTERNAL://localhost:9092,INTERNAL://kafka:29092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER  # kraft
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      # single node settings
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1  # default 3
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 # default 3
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1 # default 2
+
+  # 2. Apicurio Registry (Open Source Schema Management)
+  apicurio:
+    image: quay.io/apicurio/apicurio-registry:latest
+    container_name: apicurio
+    ports:
+      - "8081:8081"
+    environment:
+      # https://github.com/Apicurio/apicurio-registry/blob/main/README.md
+      - APICURIO_STORAGE_KIND=mem  # (mem / sql / kafkasql / gitops), default is mem
+      # https://quarkus.io/guides/all-config
+      - QUARKUS_HTTP_PORT=8081
+
+  # 3. Apicurio Registry UI
+  apicurio-ui:
+    image: quay.io/apicurio/apicurio-registry-ui:latest
+    container_name: apicurio-ui
+    ports:
+      - "8888:8080"  # This maps YOUR 8888 to internal 8080
+    environment:
+      # https://github.com/Apicurio/apicurio-registry/blob/main/ui/README.md
+      - REGISTRY_API_URL=http://localhost:8081/apis/registry/v3
+
+  # 4. Debezium Connect (The 'Engine' for CDC)
+  connect:
+    image: quay.io/debezium/connect:3.4
+    container_name: connect
+    ports:
+      - "8083:8083"
+    depends_on:
+      - kafka
+      - apicurio
+    environment:
+      # https://debezium.io/documentation/reference/tutorial.html
+      - BOOTSTRAP_SERVERS=kafka:29092  # 3 nodes would be: kafka1:29092,kafka2:29092,kafka3:29092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_connect_statuses
+      # https://kafka.apache.org/41/configuration/kafka-connect-configs/
+      # single node settings
+      - CONFIG_STORAGE_REPLICATION_FACTOR=1  # default 3
+      - OFFSET_STORAGE_REPLICATION_FACTOR=1  # default 3
+      - STATUS_STORAGE_REPLICATION_FACTOR=1  # default 3
+      # https://debezium.io/documentation/reference/configuration/avro.html
+      # Configure global converters to use Apicurio Avro
+      - KEY_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
+      - VALUE_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
+      # Point to the internal Docker network URL of Apicurio
+      - VALUE_CONVERTER_APICURIO_REGISTRY_URL=http://apicurio:8081/apis/registry/v2
+      - KEY_CONVERTER_APICURIO_REGISTRY_URL=http://apicurio:8081/apis/registry/v2
+      # Automatically register new schemas when tables change
+      - KEY_CONVERTER_APICURIO_REGISTRY_AUTO_REGISTER=true
+      - KEY_CONVERTER_APICURIO_REGISTRY_FIND_LATEST=true
+      - VALUE_CONVERTER_APICURIO_REGISTRY_AUTO_REGISTER=true
+      - VALUE_CONVERTER_APICURIO_REGISTRY_FIND_LATEST=true
+      # The "Safety" setting for Avro naming compatibility
+      - SCHEMA_NAME_ADJUSTMENT_MODE=avro
+
+  # 5. AKHQ (Apache Kafka GUI)
+  akhq:
+    image: tchiotludo/akhq:0.26.0
+    container_name: akhq
+    environment:
+      # https://akhq.io/docs/configuration/brokers.html
+      # 1. The Kafka Connection
+      AKHQ_CONNECTIONS_LOCAL_PROPERTIES_BOOTSTRAP_SERVERS: "kafka:29092"
+      
+      # 2. The Debezium Connect Connection
+      AKHQ_CONNECTIONS_LOCAL_CONNECT_0_NAME: "debezium"
+      AKHQ_CONNECTIONS_LOCAL_CONNECT_0_URL: "http://connect:8083"
+      
+      # 3. The Apicurio (Schema Registry) Connection
+      AKHQ_CONNECTIONS_LOCAL_SCHEMA_REGISTRY_URL: "http://apicurio:8081/apis/ccompat/v6"
+      AKHQ_CONNECTIONS_LOCAL_SCHEMA_REGISTRY_TYPE: "confluent"
+    ports:
+      - "8082:8080"
+    depends_on:
+      - kafka
+      - connect
+      - apicurio
+
+networks:
+  default:
+    external: true
+    name: data-pipeline-net
+
