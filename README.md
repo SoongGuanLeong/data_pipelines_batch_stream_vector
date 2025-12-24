@@ -7,11 +7,19 @@ This repository documents my learning journey in building three core types of da
 - vector db pipeline
 
 ## Batch Pipeline
-OLTP (postgresql) → Debezium → Kafka + Schema Registry → (attempting iceberg kafka sink connector → Minio)
+OLTP (postgresql) → Debezium → Kafka + Apicurio → (attempting iceberg kafka sink connector → Minio)
 
 #### Dataset: 
 [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce?resource=download)
 
 #### Tools used
-- [PostgreSQL](https://www.postgresql.org/download/)
-
+- [PostgreSQL 18](https://www.postgresql.org/download/)
+- [Docker Compose](https://www.docker.com/)
+- [Debezium 3.4](https://quay.io/repository/debezium/connect) 
+  - [docs](https://debezium.io/)
+- [Apache Kafka 3.4 - Kraft](https://quay.io/repository/debezium/kafka)
+  - [docs](https://kafka.apache.org/)
+- [Apicurio Registry 3.1.6 & its UI](https://quay.io/repository/apicurio/apicurio-registry)
+  - [docs](https://www.apicur.io/registry/docs/apicurio-registry/3.1.x/index.html)
+- [AKHQ 0.26.0 - Apache Kafka GUI](https://hub.docker.com/r/tchiotludo/akhq)
+  - [docs](https://akhq.io/docs/)
