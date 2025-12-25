@@ -3,7 +3,7 @@
 name: olist-modern-stack
 
 services:
-  # 1. Kafka (bitnami KRaft mode)
+  # 1. Kafka (apache - KRaft mode)
   kafka:
     image: apache/kafka:4.1.1
     container_name: kafka

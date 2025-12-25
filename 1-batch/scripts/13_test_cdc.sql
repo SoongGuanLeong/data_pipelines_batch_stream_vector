@@ -83,3 +83,62 @@ WHERE seller_id='s1';
 
 DELETE FROM oltp.sellers 
 WHERE seller_id='s1';
+
+-- order_items (5 FK constraints)
+INSERT INTO oltp.customers (customer_id) 
+VALUES ('c1');
+INSERT INTO oltp.orders (order_id, customer_id) 
+VALUES ('o1','c1');
+INSERT INTO oltp.product_categories (product_category_name)
+VALUES ('cat1');
+INSERT INTO oltp.products (product_id, product_category_name) 
+VALUES ('p1','cat1');
+INSERT INTO oltp.sellers (seller_id) 
+VALUES ('s1');
+
+
+INSERT INTO oltp.order_items (order_id, order_item_id, product_id, seller_id, price) 
+VALUES ('o1', '999999', 'p1', 's1', 100);
+
+UPDATE oltp.order_items 
+SET price=200
+WHERE order_id='o1' AND order_item_id='999999'
+AND product_id='p1' AND seller_id='s1';
+
+DELETE FROM oltp.order_items 
+WHERE order_id='o1' AND order_item_id='999999'
+AND product_id='p1' AND seller_id='s1';
+
+
+DELETE FROM oltp.sellers
+WHERE seller_id = 's1';
+DELETE FROM oltp.products
+WHERE product_id = 'p1';
+DELETE FROM oltp.product_categories
+WHERE product_category_name = 'cat1';
+DELETE FROM oltp.orders
+WHERE order_id = 'o1';
+DELETE FROM oltp.customers
+WHERE customer_id = 'c1';
+
+
+-- order_payments (2 FK constraints)
+INSERT INTO oltp.customers (customer_id) 
+VALUES ('c1');
+INSERT INTO oltp.orders (order_id, customer_id) 
+VALUES ('o1','c1');
+
+INSERT INTO oltp.order_payments (order_id, payment_type, payment_value) 
+VALUES ('o1','credit_card',100);
+
+UPDATE oltp.order_payments 
+SET payment_value=120 
+WHERE order_id='o1';
+
+DELETE FROM oltp.order_payments 
+WHERE order_id='o1';
+
+DELETE FROM oltp.orders
+WHERE order_id = 'o1';
+DELETE FROM oltp.customers
+WHERE customer_id = 'c1';
