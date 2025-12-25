@@ -17,7 +17,7 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio → (attempting iceberg kafk
 - [Docker Compose](https://www.docker.com/)
 - [Debezium 3.4](https://quay.io/repository/debezium/connect) 
   - [docs](https://debezium.io/)
-- [Apache Kafka 3.4 - Kraft](https://quay.io/repository/debezium/kafka)
+- [Apache Kafka 4.1.1 - Kraft](https://hub.docker.com/r/apache/kafka)
   - [docs](https://kafka.apache.org/)
 - [Apicurio Registry 3.1.6 & its UI](https://quay.io/repository/apicurio/apicurio-registry)
   - [docs](https://www.apicur.io/registry/docs/apicurio-registry/3.1.x/index.html)

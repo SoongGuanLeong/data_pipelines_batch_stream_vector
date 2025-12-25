@@ -1,0 +1,133 @@
+# Olist Data Pipeline: Debezium 3.4 (3.4.0) + kafka KRaft (4.1.1) + Apicurio (3.1.6) + AKHQ (0.26.0)
+# run this command in terminal first: docker network create data-pipeline-net
+name: olist-modern-stack
+
+services:
+  # 1. Kafka (bitnami KRaft mode)
+  kafka:
+    image: apache/kafka:4.1.1
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      # https://hub.docker.com/r/apache/kafka
+      - KAFKA_NODE_ID=1 
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093  # 3 nodes would be: 1@kafka1:9093,2@kafka2:9093,3@kafka3:9093
+      # single node settings
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1  # default 3
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 # default 3
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1 # default 2
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_NUM_PARTITIONS=3
+    volumes:
+      - kafka-data:/apache/kafka/data
+
+  # 2. Apicurio Registry (Open Source Schema Management)
+  apicurio:
+    image: quay.io/apicurio/apicurio-registry:3.1.6
+    container_name: apicurio
+    ports:
+      - "8081:8081"
+    environment:
+      # https://github.com/Apicurio/apicurio-registry/blob/main/README.md
+      # REMOVED APICURIO_STORAGE_KIND. Version 3.1.6 defaults to 'mem' automatically.
+      # https://quarkus.io/guides/all-config
+      - QUARKUS_HTTP_PORT=8081
+
+  # 3. Apicurio Registry UI
+  apicurio-ui:
+    image: quay.io/apicurio/apicurio-registry-ui:latest
+    container_name: apicurio-ui
+    ports:
+      - "8888:8080"  # This maps YOUR 8888 to internal 8080
+    environment:
+      # https://github.com/Apicurio/apicurio-registry/blob/main/ui/README.md
+      - REGISTRY_API_URL=http://apicurio:8081/apis/registry/v3
+
+  # 4. Debezium Connect (The 'Engine' for CDC)
+  connect:
+    image: quay.io/debezium/connect:3.4
+    container_name: connect
+    ports:
+      - "8083:8083"
+    depends_on:
+      - kafka
+      - apicurio
+    environment:
+      # https://debezium.io/documentation/reference/tutorial.html
+      - BOOTSTRAP_SERVERS=kafka:9092  # 3 nodes would be: kafka1:9092,kafka2:9092,kafka3:9092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_connect_statuses
+      # https://kafka.apache.org/41/configuration/kafka-connect-configs/
+      # single node settings
+      - CONFIG_STORAGE_REPLICATION_FACTOR=1  # default 3
+      - OFFSET_STORAGE_REPLICATION_FACTOR=1  # default 3
+      - STATUS_STORAGE_REPLICATION_FACTOR=1  # default 3
+
+      - KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - VALUE_CONVERTER_SCHEMAS_ENABLE=false
+
+      # https://debezium.io/documentation/reference/configuration/avro.html
+      # Configure global converters to use Apicurio Avro
+      # - ENABLE_APICURIO_CONVERTERS=true
+      # - KEY_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
+      # - VALUE_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
+      # - CONNECT_KEY_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
+      # - CONNECT_VALUE_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
+      # # Point to the internal Docker network URL of Apicurio
+      # - CONNECT_VALUE_CONVERTER_APICURIO_REGISTRY_URL=http://apicurio:8081/apis/registry/v2
+      # - CONNECT_KEY_CONVERTER_APICURIO_REGISTRY_URL=http://apicurio:8081/apis/registry/v2
+      # # Automatically register new schemas when tables change
+      # - CONNECT_KEY_CONVERTER_APICURIO_REGISTRY_AUTO_REGISTER=true
+      # - CONNECT_KEY_CONVERTER_APICURIO_REGISTRY_FIND_LATEST=true
+      # - CONNECT_VALUE_CONVERTER_APICURIO_REGISTRY_AUTO_REGISTER=true
+      # - CONNECT_VALUE_CONVERTER_APICURIO_REGISTRY_FIND_LATEST=true
+      # # The "Safety" setting for Avro naming compatibility
+      # - CONNECT_SCHEMA_NAME_ADJUSTMENT_MODE=avro
+    volumes:
+      - connect-data:/kafka-connect
+
+  # 5. AKHQ (Apache Kafka GUI)
+  akhq:
+    image: tchiotludo/akhq:0.26.0
+    container_name: akhq
+    environment:
+      # https://akhq.io/docs/configuration/brokers.html
+      # 1. The Kafka Connection      
+      # 2. The Debezium Connect Connection
+      # 3. The Apicurio (Schema Registry) Connection
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            local:
+              properties:
+                bootstrap.servers: "kafka:9092"
+              schema-registry:
+                url: "http://apicurio:8081/apis/ccompat/v7"
+                type: "confluent"
+              connect:
+                - name: "debezium"
+                  url: "http://connect:8083"
+    ports:
+      - "8082:8080"
+    depends_on:
+      - kafka
+      - connect
+      - apicurio
+
+networks:
+  default:
+    external: true
+    name: data-pipeline-net
+
+volumes:
+  kafka-data:
+  connect-data:
