@@ -128,15 +128,37 @@ VALUES ('c1');
 INSERT INTO oltp.orders (order_id, customer_id) 
 VALUES ('o1','c1');
 
-INSERT INTO oltp.order_payments (order_id, payment_type, payment_value) 
-VALUES ('o1','credit_card',100);
+INSERT INTO oltp.order_payments (order_id, payment_sequential, payment_type, payment_value) 
+VALUES ('o1', 99999, 'credit_card', 100);
 
-UPDATE oltp.order_payments 
+UPDATE oltp.order_payments
 SET payment_value=120 
-WHERE order_id='o1';
+WHERE order_id='o1' AND payment_sequential=99999;
 
 DELETE FROM oltp.order_payments 
-WHERE order_id='o1';
+WHERE order_id='o1' AND payment_sequential=99999;
+
+DELETE FROM oltp.orders
+WHERE order_id = 'o1';
+DELETE FROM oltp.customers
+WHERE customer_id = 'c1';
+
+
+-- order_reviews (2 FK constraints)
+INSERT INTO oltp.customers (customer_id) 
+VALUES ('c1');
+INSERT INTO oltp.orders (order_id, customer_id) 
+VALUES ('o1','c1');
+
+INSERT INTO oltp.order_reviews (review_id, order_id, review_score) 
+VALUES ('r1','o1',5);
+
+UPDATE oltp.order_reviews 
+SET review_score=4 
+WHERE review_id='r1';
+
+DELETE FROM oltp.order_reviews 
+WHERE review_id='r1';
 
 DELETE FROM oltp.orders
 WHERE order_id = 'o1';

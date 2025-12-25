@@ -68,4 +68,7 @@ kafka "op":
 ![customers](customers.png)
 ![orders](orders.png)
 ![products](products.png)
+![sellers](sellers.png)
 ![order_items](order_items.png)
+![order_payments](order_payments.png)
+![order_reviews](order_reviews.png)
