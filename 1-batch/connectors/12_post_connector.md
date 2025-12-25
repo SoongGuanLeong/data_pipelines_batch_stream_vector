@@ -72,3 +72,30 @@ kafka "op":
 ![order_items](order_items.png)
 ![order_payments](order_payments.png)
 ![order_reviews](order_reviews.png)
+
+
+#### 8. update connector to include SMT
+- include [SMT (single message transformation)](https://debezium.io/documentation/reference/stable/transformations/event-flattening.html) configs into the connector json 
+- refer json file 14
+```json
+"transforms": "unwrap",
+"transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+"transforms.unwrap.drop.tombstones": "true",
+"transforms.unwrap.delete.handling.mode": "rewrite"
+```
+- rewrite add a _deleted tag, drop tombstone remove kafka generated null
+  - Without drop
+  ```json
+  { "__deleted": "true", "order_id": "o1" }
+  null
+  ```
+  - With drop
+  ```json
+  { "__deleted": "true", "order_id": "o1" }
+  ```
+- use script in step 4 to update the connector 
+- restart connector
+```bash
+curl -X POST http://localhost:8083/connectors/olist-postgres/restart
+```
+- repeat [step 3](#3-verify-status)
