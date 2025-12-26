@@ -56,7 +56,8 @@ docker exec -it kafka \
 e - end
 . - current
 
-#### 6 - Test CDC for all tables (refer script 13) 
+#### 6 - Test CDC for all tables
+- refer [script 13](../scripts/13_test_cdc.sql)
 
 #### 7. Go back to step 5 and look for the latest message
 NOTE:
@@ -76,12 +77,21 @@ kafka "op":
 
 #### 8. update connector to include SMT
 - include [SMT (single message transformation)](https://debezium.io/documentation/reference/stable/transformations/event-flattening.html) configs into the connector json 
-- refer json file 14
+- refer [json file 14](14-olist-postgres-connector-update.json)
 ```json
 "transforms": "unwrap",
 "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
 "transforms.unwrap.drop.tombstones": "true",
 "transforms.unwrap.delete.handling.mode": "rewrite"
+
+"key.converter": "io.apicurio.registry.utils.converter.AvroConverter",
+"value.converter": "io.apicurio.registry.utils.converter.AvroConverter",
+"key.converter.apicurio.registry.url": "http://apicurio:8081/apis/registry/v2",
+"value.converter.apicurio.registry.url": "http://apicurio:8081/apis/registry/v2",
+"key.converter.apicurio.registry.auto-register": "true",
+"value.converter.apicurio.registry.auto-register": "true",
+"key.converter.apicurio.registry.find-latest": "true",
+"value.converter.apicurio.registry.find-latest": "true"
 ```
 - rewrite add a _deleted tag, drop tombstone remove kafka generated null
   - Without drop
@@ -93,9 +103,13 @@ kafka "op":
   ```json
   { "__deleted": "true", "order_id": "o1" }
   ```
-- use script in step 4 to update the connector 
+- use script in [step 4](#4---if-want-to-update-connector) to update the connector 
 - restart connector
 ```bash
 curl -X POST http://localhost:8083/connectors/olist-postgres/restart
 ```
-- repeat [step 3](#3-verify-status)
+- repeat [step 3](#3---verify-status)
+- pick and redo one cdc test in [step 6](#6---test-cdc-for-all-tables)
+- messages produced should be a lot shorter now
+![before_unwrapped](before_unwrapped.png)
+![after_unwrapped](after_unwrapped.png)

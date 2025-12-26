@@ -29,6 +29,7 @@ services:
 
   # 2. Apicurio Registry (Open Source Schema Management)
   apicurio:
+    # https://www.apicur.io/registry/docs/apicurio-registry/3.1.x/getting-started/assembly-configuring-registry-security.html#registry-cors-configuration_registry
     image: quay.io/apicurio/apicurio-registry:3.1.6
     container_name: apicurio
     ports:
@@ -38,6 +39,10 @@ services:
       # REMOVED APICURIO_STORAGE_KIND. Version 3.1.6 defaults to 'mem' automatically.
       # https://quarkus.io/guides/all-config
       - QUARKUS_HTTP_PORT=8081
+      - QUARKUS_HTTP_CORS=true
+      - QUARKUS_HTTP_CORS_ORIGINS=http://localhost:8888
+      - QUARKUS_HTTP_CORS_METHODS=GET,PUT,POST,PATCH,DELETE,OPTIONS
+      - QUARKUS_HTTP_CORS_HEADERS=accept,authorization,content-type,x-requested-with,origin,referer,user-agent
 
   # 3. Apicurio Registry UI
   apicurio-ui:
@@ -47,7 +52,7 @@ services:
       - "8888:8080"  # This maps YOUR 8888 to internal 8080
     environment:
       # https://github.com/Apicurio/apicurio-registry/blob/main/ui/README.md
-      - REGISTRY_API_URL=http://apicurio:8081/apis/registry/v3
+      - REGISTRY_API_URL=http://localhost:8081/apis/registry/v3
 
   # 4. Debezium Connect (The 'Engine' for CDC)
   connect:
@@ -77,21 +82,16 @@ services:
 
       # https://debezium.io/documentation/reference/configuration/avro.html
       # Configure global converters to use Apicurio Avro
-      # - ENABLE_APICURIO_CONVERTERS=true
-      # - KEY_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
-      # - VALUE_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
-      # - CONNECT_KEY_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
-      # - CONNECT_VALUE_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
-      # # Point to the internal Docker network URL of Apicurio
-      # - CONNECT_VALUE_CONVERTER_APICURIO_REGISTRY_URL=http://apicurio:8081/apis/registry/v2
-      # - CONNECT_KEY_CONVERTER_APICURIO_REGISTRY_URL=http://apicurio:8081/apis/registry/v2
-      # # Automatically register new schemas when tables change
-      # - CONNECT_KEY_CONVERTER_APICURIO_REGISTRY_AUTO_REGISTER=true
-      # - CONNECT_KEY_CONVERTER_APICURIO_REGISTRY_FIND_LATEST=true
-      # - CONNECT_VALUE_CONVERTER_APICURIO_REGISTRY_AUTO_REGISTER=true
-      # - CONNECT_VALUE_CONVERTER_APICURIO_REGISTRY_FIND_LATEST=true
-      # # The "Safety" setting for Avro naming compatibility
-      # - CONNECT_SCHEMA_NAME_ADJUSTMENT_MODE=avro
+      - ENABLE_APICURIO_CONVERTERS=true
+      - KEY_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
+      - VALUE_CONVERTER=io.apicurio.registry.utils.converter.AvroConverter
+      - CONNECT_KEY_CONVERTER_APICURIO_REGISTRY_URL=http://apicurio:8081/apis/registry/v2
+      - CONNECT_VALUE_CONVERTER_APICURIO_REGISTRY_URL=http://apicurio:8081/apis/registry/v2
+      - CONNECT_KEY_CONVERTER_APICURIO_REGISTRY_AUTO_REGISTER=true
+      - CONNECT_KEY_CONVERTER_APICURIO_REGISTRY_FIND_LATEST=true
+      - CONNECT_VALUE_CONVERTER_APICURIO_REGISTRY_AUTO_REGISTER=true
+      - CONNECT_VALUE_CONVERTER_APICURIO_REGISTRY_FIND_LATEST=true
+      - CONNECT_SCHEMA_NAME_ADJUSTMENT_MODE=avro
     volumes:
       - connect-data:/kafka-connect
 
