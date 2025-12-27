@@ -53,4 +53,4 @@ curl http://localhost:8083/connectors/olist-postgres/status
 - new column should appear in the registry
 ![2nd_version](2nd_version.png)
 ![schema_change](schema_change.png)
-- even if we drop the column afterwards, registry still remembers it as version 2 history
+- even if we drop the column afterwards, registry still remembers it as v2 history

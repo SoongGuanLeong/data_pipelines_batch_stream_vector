@@ -1,4 +1,4 @@
-# Olist Data Pipeline: Debezium 3.4 (3.4.0) + kafka KRaft (4.1.1) + Apicurio (3.1.6) + AKHQ (0.26.0)
+# Olist Data Pipeline Ingestion: Debezium 3.4 (3.4.0) + kafka KRaft (4.1.1) + Apicurio (3.1.6) + AKHQ (0.26.0)
 # run this command in terminal first: docker network create data-pipeline-net
 name: olist-modern-stack
 
