@@ -1,6 +1,5 @@
 # Olist Data Pipeline Analytics: Minio + Spark + Iceberg
 # https://iceberg.apache.org/docs/latest/
-# https://github.com/minio/minio
 # https://hadoop.apache.org/docs/stable/hadoop-aws/
 name: olist-modern-analytics-stack
 
@@ -37,6 +36,8 @@ services:
       mc mb -p local/staging;
       tail -f /dev/null
       "
+  
+  # 3. 
 
 
 networks:
