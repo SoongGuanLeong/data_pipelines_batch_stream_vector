@@ -7,7 +7,7 @@ This repository documents my learning journey in building three core types of da
 - vector db pipeline
 
 ## Batch Pipeline
-OLTP (postgresql) → Debezium → Kafka + Apicurio → (attempting iceberg kafka sink connector → Minio)
+OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attempting iceberg kafka sink connector)
 
 #### Dataset: 
 [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce?resource=download)
@@ -23,3 +23,6 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio → (attempting iceberg kafk
   - [docs](https://www.apicur.io/registry/docs/apicurio-registry/3.1.x/index.html)
 - [AKHQ 0.26.0 - Apache Kafka GUI](https://hub.docker.com/r/tchiotludo/akhq)
   - [docs](https://akhq.io/docs/)
+- [Minio - RELEASE.2025-09-07T16-13-09Z-cpuv1](https://github.com/minio/minio)
+  - [docs](https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/root-credentials/)
+- [Minio Client (mc)](https://hub.docker.com/r/minio/mc)
