@@ -37,8 +37,11 @@ services:
       tail -f /dev/null
       "
   
-  # 3. Apache Spark
-  # https://iceberg.apache.org/spark-quickstart/#docker-compose
+  # 3. Apache Spark - version affected by Iceberg compatibility
+  # https://iceberg.apache.org/releases/  - showed the latest jar
+  # https://iceberg.apache.org/spark-quickstart/#docker-compose  - show a docker-compose example
+  # https://spark.apache.org/downloads.html  - show hadoop version 
+  # https://central.sonatype.com/artifact/org.apache.hadoop/hadoop-aws/  - show 3.4.2
   spark:
     build:
       context: ./spark
@@ -58,10 +61,11 @@ services:
     volumes:
       - ./warehouse:/home/iceberg/warehouse
       - ./notebooks:/home/iceberg/notebooks/notebooks
+    # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
     command: >
       /opt/spark/bin/spark-sql
-      --packages org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.6.0, 
-      org.apache.hadoop:hadoop-aws:3.3.4
+      --packages org.apache.iceberg:iceberg-spark-runtime-4.0_2.13:1.10.1, 
+      org.apache.hadoop:hadoop-aws:3.4.2
 
 
 networks:
