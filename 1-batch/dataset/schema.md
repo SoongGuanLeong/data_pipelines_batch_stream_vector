@@ -114,3 +114,26 @@ erDiagram
     PRODUCT_CATEGORIES ||--o{ PRODUCTS : categorizes
 
 ```
+
+## PostgreSQL Index Types Cheat Sheet
+- B-tree, GIN, BRIN is the most commonly used indexes
+
+| Index Type                           | Supported Queries / Use Cases                             | Importance    | Notes                                                              |
+| ------------------------------------ | --------------------------------------------------------- | ------------- | ------------------------------------------------------------------ |
+| **B-Tree**                           | `=`, `<`, `>`, `<=`, `>=`; ORDER BY                       | **Must Know** | Default; used for PK/FK, most equality/range queries               |
+| **Hash**                             | `=` only                                                  | Low           | Rarely used; B-Tree is usually sufficient                          |
+| **GIN (Generalized Inverted Index)** | Arrays, JSONB, full-text search                           | **Important** | Fast multi-value lookups; can index `jsonb_path_ops` or `tsvector` |
+| **GiST (Generalized Search Tree)**   | Geospatial, range types, full-text search                 | Medium        | Used by PostGIS and complex data types                             |
+| **SP-GiST (Space-Partitioned GiST)** | Non-overlapping / partitioned data (quadtrees, k-d trees) | Low/Medium    | Specialized; rarely needed                                         |
+| **BRIN (Block Range Index)**         | Huge tables with naturally ordered data                   | **Medium**        | Lightweight; ideal for time series or append-only tables           |
+| **Expression / Functional Index**    | Index on computed value, e.g., `LOWER(col)`               | Important     | Useful when filtering on expressions                               |
+| **Partial Index**                    | Index a subset of rows, e.g., `WHERE status='active'`     | Medium        | Saves space and improves query performance for filtered queries    |
+
+- some slides from this [video](https://www.youtube.com/watch?v=_HG2eB27j00)
+![B-Tree-1](B-Tree-1.png)
+![B-Tree-2](B-Tree-2.png)
+![GIN-1](GIN-1.png)
+![GIN-2](GIN-2.png)
+![GIN-3](GIN-3.png)
+![BRIN-1](BRIN-1.png)
+![BRIN-2](BRIN-2.png)
