@@ -51,10 +51,16 @@ services:
       - minio
     ports:
       - 8888:8888   # Jupyter
-      - 8080:8080   # Spark UI
+      - 4040:4040   # Spark UI
       - 10000:10000 # Thrift server
       - 10001:10001 # optional additional port
     environment:
+      # these four are added by gpt during debugging
+      HOME: /home/spark
+      SPARK_LOCAL_IP: 0.0.0.0
+      SPARK_UI_BIND_ADDRESS: 0.0.0.0
+      SPARK_UI_PORT: 4040
+
       AWS_ACCESS_KEY_ID: minioadmin
       AWS_SECRET_ACCESS_KEY: minioadmin
       AWS_REGION: us-east-1
@@ -62,11 +68,6 @@ services:
       - ./warehouse:/home/iceberg/warehouse
       - ./notebooks:/home/iceberg/notebooks/notebooks
     # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
-    command: >
-      /opt/spark/bin/spark-sql
-      --packages org.apache.iceberg:iceberg-spark-runtime-4.0_2.13:1.10.1, 
-      org.apache.hadoop:hadoop-aws:3.4.2
-
 
 networks:
   default:
