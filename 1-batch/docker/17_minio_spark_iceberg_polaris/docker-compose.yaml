@@ -30,17 +30,20 @@ services:
       - minio
     entrypoint: >
       /bin/sh -c "
-      until mc alias set local http://minio:9000 minioadmin minioadmin; do sleep 1; done;
-      mc mb -p local/warehouse;
-      mc mb -p local/raw;
-      mc mb -p local/staging;
+      echo 'Waiting for MinIO...';
+      until curl -s http://minio:9000/minio/health/ready; do sleep 2; done;
+      echo 'MinIO is ready';
+      mc alias set local http://minio:9000 minioadmin minioadmin;
+      mc mb --ignore-existing local/warehouse;
+      mc mb --ignore-existing local/raw;
+      mc mb --ignore-existing local/staging;
       tail -f /dev/null
       "
   
   # 3. Apache Spark - version affected by Iceberg compatibility
   # https://iceberg.apache.org/releases/  - showed the latest jar
   # https://iceberg.apache.org/spark-quickstart/#docker-compose  - show a docker-compose example
-  # https://spark.apache.org/downloads.html  - show hadoop version 
+  # print(spark._jvm.org.apache.hadoop.util.VersionInfo.getVersion())  - show hadoop version 
   # https://central.sonatype.com/artifact/org.apache.hadoop/hadoop-aws/  - show 3.4.2
   spark:
     build:
