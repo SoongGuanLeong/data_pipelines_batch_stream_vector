@@ -31,12 +31,18 @@ services:
     entrypoint: >
       /bin/sh -c "
       echo 'Waiting for MinIO...';
-      until curl -s http://minio:9000/minio/health/ready; do sleep 2; done;
-      echo 'MinIO is ready';
-      mc alias set local http://minio:9000 minioadmin minioadmin;
+      while ! mc alias set local http://minio:9000 minioadmin minioadmin; do
+        echo 'MinIO not reachable yet, retrying in 2s...';
+        sleep 2;
+      done;
+
+      echo 'MinIO is ready. Creating buckets...';
       mc mb --ignore-existing local/warehouse;
       mc mb --ignore-existing local/raw;
       mc mb --ignore-existing local/staging;
+      
+      echo 'Buckets created successfully:';
+      mc ls local;
       tail -f /dev/null
       "
   
@@ -69,7 +75,7 @@ services:
       AWS_REGION: us-east-1
     volumes:
       - ./warehouse:/home/iceberg/warehouse
-      - ./notebooks:/home/iceberg/notebooks/notebooks
+      - ./notebooks:/home/iceberg/notebooks
     # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
 
 networks:
