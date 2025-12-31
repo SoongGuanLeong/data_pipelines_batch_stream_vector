@@ -1,4 +1,4 @@
-# Olist Data Pipeline Analytics: Minio + Spark + Iceberg
+# Olist Data Pipeline Analytics: Minio + Spark + Iceberg + Polaris (1.2.0-incubating)
 # https://iceberg.apache.org/docs/latest/
 # https://hadoop.apache.org/docs/stable/hadoop-aws/
 name: olist-modern-analytics-stack
@@ -77,6 +77,17 @@ services:
       - ./warehouse:/home/iceberg/warehouse
       - ./notebooks:/home/iceberg/notebooks
     # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
+
+  # 4. Polaris (Iceberg REST catalog) 
+  polaris:
+    image: apache/polaris:1.2.0-incubating
+    container_name: polaris
+    ports:
+      - "8181:8181" # The API we will talk to
+      - "8182:8182" # Admin/Management
+    environment:
+      - POLARIS_BOOTSTRAP_CREDENTIALS=POLARIS,admin,password123
+      - POLARIS_REALM=POLARIS
 
 networks:
   default:
