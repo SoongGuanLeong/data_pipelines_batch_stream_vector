@@ -83,7 +83,7 @@
     ```
   - **Expected Result**: ```201 Created```
   - Hit **Save as** and rename as create-Principal-Spark
-  - Hit **Save Response** and rename as example-response (**IMPORTANT**: we need this to remember ```clientId``` and ```clientSecret```)
+  - Hit **Save Response** and rename as example-response (**IMPORTANT**: we need ```clientId``` and ```clientSecret``` to be put into [spark-defaults.conf](../docker/17_minio_spark_iceberg_polaris/spark/conf/spark-defaults.conf))
 ![Create_Principal](Create_Principal.png)
 
 #### Principal Role
@@ -143,7 +143,7 @@
 - Hit **Save as** and rename as assign-Principal-Role-Spark-Role
 ![Grant_access](Grant_access.png)
 
-### Final Polaris Setup Check
+### 5 - Final Polaris Setup Check
 - ```Polaris Management Service``` ➡️ ```principal-roles``` ➡️ ```{principalRoleName}``` ➡️ ```catalog-roles``` ➡️ ```{catalogName}``` ➡️ ```Get list Catalog Role For Principal Role```
 - **Params** tab ➡️ Path Variables
   - ```principalRoleName: spark_role```
