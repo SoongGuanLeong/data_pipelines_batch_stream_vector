@@ -16,7 +16,7 @@
 ![Set_base_url](Set_base_url.png)
 
 ### 3 - [Connect Using REST APIs (token)](https://polaris.apache.org/releases/1.1.0/getting-started/using-polaris/#connecting-using-rest-apis)
-- **Warning**: Deprecated. This step 3 should be replaced with Keycloak in the future.
+- **Warning**: Deprecated. This step 3 should be replaced with [Keycloak](https://hub.docker.com/r/keycloak/keycloak) in the future.
 - Also since free version of postman does not allow us to use another spec (like what we did in step 2) we are doing this step manually like below:
   - ```Polaris Management Service``` ➡️ ```Variables```
     - ```catalogUrl: {{scheme}}://{{host}}/api/catalog/v1```
@@ -35,7 +35,7 @@
 
 ### 4 - [Role-based Access Control RBAC](https://polaris.apache.org/releases/1.2.0/managing-security/access-control/)
 #### Create Catalog
-- ```Polaris Management Service``` ➡️ ```catalogs``` ➡️ ```create Catalog``` (to link polaris to Minio)
+- ```Polaris Management Service``` ➡️ ```catalogs``` ➡️ ```POST create Catalog``` (to link polaris to Minio)
   - **Request Type**: ```POST```
   - **URL**: ```{{baseUrl}}/catalogs```
   - **Authorization** tab ➡️ ```Auth Type``` ➡️ ```Bearer Token```.
@@ -66,7 +66,7 @@
 ![create_catalog](create_catalog.png)
 
 #### Create Principal
-- ```Polaris Management Service``` ➡️ ```principals``` ➡️ ```create Principal``` (Spark user)
+- ```Polaris Management Service``` ➡️ ```principals``` ➡️ ```POST create Principal``` (Spark user)
   - **Request Type**: POST
   - **URL**: ```{{baseUrl}}/principals```
   - **Authorization** tab ➡️ ```Auth Type``` ➡️ ```Bearer Token```.
@@ -85,3 +85,82 @@
   - Hit **Save as** and rename as create-Principal-Spark
   - Hit **Save Response** and rename as example-response (**IMPORTANT**: we need this to remember ```clientId``` and ```clientSecret```)
 ![Create_Principal](Create_Principal.png)
+
+#### Principal Role
+- bridge between principal and catalog
+- Chain: principal ➡️ Principal Role ➡️ catalog
+- Example: spark_user ➡️ spark_role ➡️ learning_catalog
+- their API url has this kind of pattern:
+  - principals/spark_user
+  - principal-roles/spark_role
+  - catalog-roles/learning_catalog/catalog_admin
+
+##### Create Principal Role
+- ```Polaris Management Service``` ➡️ ```principal-roles``` ➡️ ```POST create Principal Role```
+- **Request Type**: POST
+- **URL**: ```{{baseUrl}}/principal-roles```
+- **Authorization** tab ➡️ ```Auth Type``` ➡️ ```Bearer Token```.
+  - Paste the token we created at Step 3.
+- **Body (Raw JSON)**:
+  ```json
+  { "principalRole": { "name": "spark_role" } }
+  ```
+- **Expected Result**: ```201 Created```
+- Hit **Save as** and rename as create-Principal-Role-Spark-Role
+- Hit **Save Response** and rename as example-response
+![Create_Principal_Role](Create_Principal_Role.png)
+
+##### Link User to Role
+- ```Polaris Management Service``` ➡️ ```principals``` ➡️ ```{principalName}``` ➡️ ```principal-roles``` ➡️ ```PUT assign Principal Role```
+- **Request Type**: PUT
+- **URL**: {{baseUrl}}/principals/:principalName/principal-roles
+- **Params** tab ➡️ Path Variables
+  - ```principalName: spark_user```
+- **Authorization** tab ➡️ ```Auth Type``` ➡️ ```Bearer Token```.
+  - Paste the token we created at Step 3.
+- **Body (Raw JSON)**:
+  ```json
+  { "principalRole": { "name": "spark_role" } }
+  ```
+- **Expected Result**: ```201 Created``` (no response)
+- Hit **Save as** and rename as assign-Principal-Role-Spark-Role
+![Assign_Principal_Role](Assign_Principal_Role.png)
+
+##### Grant Access to Principal Role
+- ```Polaris Management Service``` ➡️ ```principal-roles``` ➡️ ```{principalRoleName}``` ➡️ ```catalog-roles``` ➡️ ```{catalogName}``` ➡️ ```PUT assign Catalog Role To Principal Role```
+- **Request Type**: PUT
+- **URL**: {{baseUrl}}/principal-roles/:principalRoleName/catalog-roles/:catalogName
+- **Params** tab ➡️ Path Variables
+  - ```principalRoleName: spark_role```
+  - ```catalogName: learning_catalog```
+- **Authorization** tab ➡️ ```Auth Type``` ➡️ ```Bearer Token```.
+  - Paste the token we created at Step 3.
+- **Body (Raw JSON)**:
+  ```json
+  { "catalogRole": { "name": "catalog_admin" } }
+  ```
+- **Expected Result**: ```201 Created``` (no response)
+- Hit **Save as** and rename as assign-Principal-Role-Spark-Role
+![Grant_access](Grant_access.png)
+
+### Final Polaris Setup Check
+- ```Polaris Management Service``` ➡️ ```principal-roles``` ➡️ ```{principalRoleName}``` ➡️ ```catalog-roles``` ➡️ ```{catalogName}``` ➡️ ```Get list Catalog Role For Principal Role```
+- **Params** tab ➡️ Path Variables
+  - ```principalRoleName: spark_role```
+  - ```catalogName: learning_catalog```
+- **Authorization** tab ➡️ ```Auth Type``` ➡️ ```Bearer Token```.
+  - Paste the token we created at Step 3.
+- **Expected Result**: ```200 OK```
+  ```json
+  {
+        "roles": [
+            {
+                "name": "catalog_admin",
+                "properties": {},
+                "createTimestamp": 1767227445348,
+                "lastUpdateTimestamp": 1767227445348,
+                "entityVersion": 1
+            }
+        ]
+    }
+  ```
