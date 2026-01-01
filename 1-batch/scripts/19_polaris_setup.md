@@ -9,5 +9,79 @@
 - Get the link shown
 ![API_yml_link](API_yml_link.png)
 - Open Postman ➡️ Import ➡️ Paste the link you copied
+![Import_Polaris_API_yml](Import_Polaris_API_yml.png)
+- ```Polaris Management Service``` ➡️ ```Variables```
+  - ```scheme: http```
+  - ```host: localhost:8181```
+![Set_base_url](Set_base_url.png)
 
- 
+### 3 - [Connect Using REST APIs (token)](https://polaris.apache.org/releases/1.1.0/getting-started/using-polaris/#connecting-using-rest-apis)
+- **Warning**: Deprecated. This step 3 should be replaced with Keycloak in the future.
+- Also since free version of postman does not allow us to use another spec (like what we did in step 2) we are doing this step manually like below:
+  - ```Polaris Management Service``` ➡️ ```Variables```
+    - ```catalogUrl: {{scheme}}://{{host}}/api/catalog/v1```
+  - Click on the ➕ icon beside ```Polaris Management Service``` to add request
+    - rename this collection as request-access-token
+    - use **POST** method, ```{{catalogUrl}}/oauth/tokens```
+    - **Headers** tab: Add ```Polaris-Realm : POLARIS```.
+    - **Body** tab: Select *x-www-form-urlencoded* and enter:
+        - ```grant_type: client_credentials```
+        - ```client_id: admin```
+        - ```client_secret: password123```
+        - ```scope: PRINCIPAL_ROLE:ALL```
+    - Hit **Send**. The token is temporary and expires in 1 hour. Hit **Save** so we can reuse this request-access-token collection again.
+    - Hit **Save Response** and rename as example-response
+  ![Get_Access_Token](Get_Access_Token.png)
+
+### 4 - [Role-based Access Control RBAC](https://polaris.apache.org/releases/1.2.0/managing-security/access-control/)
+#### Create Catalog
+- ```Polaris Management Service``` ➡️ ```catalogs``` ➡️ ```create Catalog``` (to link polaris to Minio)
+  - **Request Type**: ```POST```
+  - **URL**: ```{{baseUrl}}/catalogs```
+  - **Authorization** tab ➡️ ```Auth Type``` ➡️ ```Bearer Token```.
+    - Paste the token we created at Step 3.
+  - **Headers** tab:
+    - ```Polaris-Realm```: ```POLARIS```
+  - **Body (Raw JSON)**:
+    ```json
+    {
+        "catalog": {
+            "name": "learning_catalog",
+            "type": "INTERNAL",
+            "properties": {
+            "default-base-location": "s3://warehouse/"
+            },
+            "storageConfigInfo": {
+            "storageType": "S3",
+            "allowedLocations": ["s3://warehouse/"],
+            "endpoint": "http://localhost:9000",
+            "endpointInternal": "http://minio:9000"
+            }
+        }
+    }
+    ```
+  - **Expected Result**: ```201 Created```
+  - Hit **Save AS** and rename as create-Catalog-S3
+  - Hit **Save Response** and rename as example-response
+![create_catalog](create_catalog.png)
+
+#### Create Principal
+- ```Polaris Management Service``` ➡️ ```principals``` ➡️ ```create Principal``` (Spark user)
+  - **Request Type**: POST
+  - **URL**: ```{{baseUrl}}/principals```
+  - **Authorization** tab ➡️ ```Auth Type``` ➡️ ```Bearer Token```.
+    - Paste the token we created at Step 3.
+  - **Headers**:
+    - ```Polaris-Realm: POLARIS```
+  - **Body (Raw JSON)**:
+    ```json
+    {
+        "principal": {
+            "name": "spark_user"
+        }
+    }
+    ```
+  - **Expected Result**: ```201 Created```
+  - Hit **Save as** and rename as create-Principal-Spark
+  - Hit **Save Response** and rename as example-response (**IMPORTANT**: we need this to remember ```clientId``` and ```clientSecret```)
+![Create_Principal](Create_Principal.png)
