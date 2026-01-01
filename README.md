@@ -30,3 +30,4 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
   - [docs](https://spark.apache.org/)
 - [Apache Iceberg](https://iceberg.apache.org/releases/) - Open table format
 - [Apache Polaris](https://polaris.apache.org/) - REST catalog for Apache Iceberg (AWS Glue catalog substitute)
+- [Postman](https://www.postman.com/) - API platform to work with APIs
