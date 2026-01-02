@@ -165,13 +165,3 @@
         ]
     }
   ```
-
-### 6 - create a warehouse with Polaris API
-[BUG](https://github.com/apache/polaris/issues/358):
-
-Even in the latest Polaris dev OpenAPI:
-- The Iceberg REST spec doesn’t define “warehouse,” so the endpoint is implementation-specific.
-- Polaris may expose it internally, but it’s not guaranteed to be listed in the OpenAPI spec or rendered docs as a public endpoint.
-- That’s why searching in the dev spec or the rendered docs often shows nothing — it doesn’t mean the warehouse concept isn’t required; it just means Polaris treats it as an internal/metadata layer.
-
-The practical takeaway: you can’t rely on Spark or the Iceberg REST spec to auto-create a warehouse — you must use Polaris’ API or CLI to create it, even if the docs don’t show the endpoint.

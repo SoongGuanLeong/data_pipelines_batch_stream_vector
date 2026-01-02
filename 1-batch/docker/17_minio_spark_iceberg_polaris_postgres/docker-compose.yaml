@@ -84,6 +84,9 @@ services:
   polaris:
     image: apache/polaris:1.2.0-incubating
     container_name: polaris
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "8181:8181" # The API we will talk to
       - "8182:8182" # Admin/Management
@@ -97,7 +100,19 @@ services:
       # these are needed to create token
       POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,admin,password123
       POLARIS_REALM: POLARIS
-      
+
+  # 5. postgres for Polaris
+  postgres:
+    image: postgres:16.11-bookworm
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_DB: polaris
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - polaris_pgdata:/var/lib/postgresql/data
+
 networks:
   default:
     external: true
@@ -105,3 +120,4 @@ networks:
 
 volumes:
   minio_data:
+  polaris_pgdata:
