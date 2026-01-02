@@ -5,10 +5,18 @@ USER root
 # ---------------------------
 # 1️⃣ Set up Spark home & Jupyter user
 # ---------------------------
-RUN mkdir -p /home/spark /home/iceberg/warehouse /home/iceberg/notebooks && \
-    chown -R spark:spark /home/spark /home/iceberg/warehouse
+RUN mkdir -p /home/spark /home/iceberg/warehouse /home/iceberg/notebooks /opt/spark/conf && \
+    chown -R spark:spark /home/spark /home/iceberg/warehouse /home/iceberg/notebooks /opt/spark/conf
 
-# ENV HOME=/home/spark
+ENV HOME=/home/spark
+ENV SPARK_HOME=/opt/spark
+ENV SPARK_CONF_DIR=/opt/spark/conf
+ENV JUPYTER_RUNTIME_DIR=/home/spark/.local/share/jupyter/runtime
+ENV JUPYTER_CONFIG_DIR=/home/spark/.jupyter
+ENV PYSPARK_PYTHON=python3
+ENV PYSPARK_DRIVER_PYTHON=python3
+ENV PATH=$PATH:$SPARK_HOME/bin
+
 WORKDIR /home/spark
 
 # ---------------------------
@@ -16,7 +24,7 @@ WORKDIR /home/spark
 # ---------------------------
 RUN apt-get update && \
     apt-get install -y python3-pip wget libsnappy-dev zlib1g-dev && \
-    pip3 install --no-cache-dir notebook findspark pyspark==4.0.1
+    pip3 install --no-cache-dir notebook findspark pyspark==4.0.1 boto3
 
 # ---------------------------
 # 3️⃣ Add required jars
@@ -27,9 +35,6 @@ RUN wget -P /opt/spark/jars https://repo1.maven.org/maven2/org/apache/iceberg/ic
     # AWS SDK bundle
     wget -P /opt/spark/jars https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.24.6/bundle-2.24.6.jar && \
     wget -P /opt/spark/jars https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.20.0/log4j-slf4j-impl-2.20.0.jar
-
-COPY conf/log4j2.properties /opt/spark/conf/log4j2.properties
-COPY conf/spark-defaults.conf /opt/spark/conf/spark-defaults.conf
 
 # ---------------------------
 # 6️⃣ Switch to spark user

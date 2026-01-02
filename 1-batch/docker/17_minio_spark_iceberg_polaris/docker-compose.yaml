@@ -65,16 +65,19 @@ services:
       - 10000:10000 # Thrift server
       - 10001:10001 # optional additional port
     environment:
-      # these four are added by gpt during debugging
-      HOME: /home/spark
+      # these are added by gpt during debugging
       SPARK_LOCAL_IP: 0.0.0.0
       SPARK_UI_BIND_ADDRESS: 0.0.0.0
       SPARK_UI_PORT: 4040
-
+      SPARK_CONF_DIR: /opt/spark/conf
+      SPARK_HOME: /opt/spark
       AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
     volumes:
       # - ./warehouse:/home/iceberg/warehouse (minio have persistent volume)
       - ./notebooks:/home/iceberg/notebooks
+      - ./spark/conf:/opt/spark/conf
     # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
 
   # 4. Polaris (Iceberg REST catalog) 
@@ -85,10 +88,16 @@ services:
       - "8181:8181" # The API we will talk to
       - "8182:8182" # Admin/Management
     environment:
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      #JAVA_OPTS: -Daws.region=us-east-1
+      AWS_ENDPOINT: http://minio:9000/
+      AWS_S3_FORCE_PATH_STYLE: "true"
       # these are needed to create token
-      - POLARIS_BOOTSTRAP_CREDENTIALS=POLARIS,admin,password123
-      - POLARIS_REALM=POLARIS
-
+      POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,admin,password123
+      POLARIS_REALM: POLARIS
+      
 networks:
   default:
     external: true
