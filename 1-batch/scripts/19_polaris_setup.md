@@ -1,6 +1,6 @@
 # Polaris Setup
 
-### 1 - Install [Postman](https://www.postman.com/downloads/)
+### 1 - Install [Postman](https://www.postman.com/downloads/). Import my [saved collection](https://.postman.co/workspace/My-Workspace~f29b62ad-b11c-4c57-8947-1912bc804f26/collection/45905186-53ce3d85-f290-4e57-8015-f3250d66b879?action=share&creator=45905186) or you do it yourself from the steps below.
 
 ### 2 - Get Polaris API link
 - Go to [polaris docs](https://polaris.apache.org/)
@@ -55,7 +55,8 @@
             "storageType": "S3",
             "allowedLocations": ["s3://warehouse/"],
             "endpoint": "http://localhost:9000",
-            "endpointInternal": "http://minio:9000"
+            "endpointInternal": "http://minio:9000",
+            "pathStyleAccess": true
             }
         }
     }
@@ -140,7 +141,7 @@
   { "catalogRole": { "name": "catalog_admin" } }
   ```
 - **Expected Result**: ```201 Created``` (no response)
-- Hit **Save as** and rename as assign-Principal-Role-Spark-Role
+- Hit **Save as** and rename as assign-Catalog-Role-To-Principal-Role-catalog-admin
 ![Grant_access](Grant_access.png)
 
 ### 5 - Final Polaris Setup Check
@@ -164,3 +165,13 @@
         ]
     }
   ```
+
+### 6 - create a warehouse with Polaris API
+[BUG](https://github.com/apache/polaris/issues/358):
+
+Even in the latest Polaris dev OpenAPI:
+- The Iceberg REST spec doesn’t define “warehouse,” so the endpoint is implementation-specific.
+- Polaris may expose it internally, but it’s not guaranteed to be listed in the OpenAPI spec or rendered docs as a public endpoint.
+- That’s why searching in the dev spec or the rendered docs often shows nothing — it doesn’t mean the warehouse concept isn’t required; it just means Polaris treats it as an internal/metadata layer.
+
+The practical takeaway: you can’t rely on Spark or the Iceberg REST spec to auto-create a warehouse — you must use Polaris’ API or CLI to create it, even if the docs don’t show the endpoint.
