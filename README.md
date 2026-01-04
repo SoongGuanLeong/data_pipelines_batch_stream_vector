@@ -19,7 +19,7 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
   - [docs](https://debezium.io/)
 - [Apache Kafka 4.1.1 - Kraft](https://hub.docker.com/r/apache/kafka) - To handle message queues
   - [docs](https://kafka.apache.org/)
-- [Apicurio Registry 3.1.6 & its UI](https://quay.io/repository/apicurio/apicurio-registry) - Schema registry to make Kafka messages shorter
+- [Apicurio Registry 3.1.6 & its UI](https://quay.io/repository/apicurio/apicurio-registry) - Schema registry to serialize/deserialize message queues
   - [docs](https://www.apicur.io/registry/docs/apicurio-registry/3.1.x/index.html)
 - [AKHQ 0.26.0](https://hub.docker.com/r/tchiotludo/akhq) - - Apache Kafka GUI
   - [docs](https://akhq.io/docs/)
@@ -28,6 +28,6 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
 - [Minio Client (mc)](https://hub.docker.com/r/minio/mc)
 - [Apache Spark](https://hub.docker.com/r/apache/spark)
   - [docs](https://spark.apache.org/)
-- [Apache Iceberg](https://iceberg.apache.org/releases/) - Open table format
-- [Apache Polaris](https://polaris.apache.org/) - REST catalog for Apache Iceberg (AWS Glue catalog substitute)
+- [Apache Iceberg](https://iceberg.apache.org/releases/) - Open table format  (metadata inside table)
+- [Apache Polaris](https://polaris.apache.org/) - REST catalog for Apache Iceberg (AWS Glue catalog substitute - metadata outside table)
 - [Postman](https://www.postman.com/) - API platform to work with APIs
