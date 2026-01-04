@@ -37,9 +37,7 @@ services:
       done;
 
       echo 'MinIO is ready. Creating buckets...';
-      mc mb --ignore-existing local/warehouse;
-      mc mb --ignore-existing local/raw;
-      mc mb --ignore-existing local/staging;
+      mc mb --ignore-existing local/olist_ecommerce;
       
       echo 'Buckets created successfully:';
       mc ls local;

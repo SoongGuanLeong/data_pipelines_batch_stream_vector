@@ -49,11 +49,11 @@
             "name": "learning_catalog",
             "type": "INTERNAL",
             "properties": {
-            "default-base-location": "s3://warehouse/"
+            "default-base-location": "s3://olist_ecommerce/"
             },
             "storageConfigInfo": {
             "storageType": "S3",
-            "allowedLocations": ["s3://warehouse/"],
+            "allowedLocations": ["s3://olist_ecommerce/"],
             "endpoint": "http://localhost:9000",
             "endpointInternal": "http://minio:9000",
             "pathStyleAccess": true
