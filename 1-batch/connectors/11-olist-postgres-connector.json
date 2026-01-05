@@ -12,6 +12,20 @@
     
     "topic.prefix": "olist",
     "slot.name": "olist_slot",
-    "table.include.list": "oltp\\.(customers|sellers|products|orders|order_items|order_payments|order_reviews)"
+    "table.include.list": "oltp\\.(customers|sellers|products|orders|order_items|order_payments|order_reviews)",
+
+    "transforms": "unwrap",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "true",
+    "transforms.unwrap.delete.handling.mode": "rewrite",
+
+    "key.converter": "io.apicurio.registry.utils.converter.AvroConverter",
+    "value.converter": "io.apicurio.registry.utils.converter.AvroConverter",
+    "key.converter.apicurio.registry.url": "http://apicurio:8081/apis/registry/v2",
+    "value.converter.apicurio.registry.url": "http://apicurio:8081/apis/registry/v2",
+    "key.converter.apicurio.registry.auto-register": "true",
+    "value.converter.apicurio.registry.auto-register": "true",
+    "key.converter.apicurio.registry.find-latest": "true",
+    "value.converter.apicurio.registry.find-latest": "true"
   }
 }
