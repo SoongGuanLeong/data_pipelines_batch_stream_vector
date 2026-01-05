@@ -26,17 +26,7 @@ RUN apt-get update && \
     apt-get install -y python3-pip wget libsnappy-dev zlib1g-dev && \
     pip3 install --no-cache-dir notebook findspark pyspark==4.0.1 boto3
 
-# ---------------------------
-# 3️⃣ Add required jars
-# ---------------------------
-RUN wget -P /opt/spark/jars https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-4.0_2.13/1.10.1/iceberg-spark-runtime-4.0_2.13-1.10.1.jar && \
-    # Hadoop AWS
-    wget -P /opt/spark/jars https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.4.1/hadoop-aws-3.4.1.jar && \
-    # AWS SDK bundle
-    wget -P /opt/spark/jars https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.24.6/bundle-2.24.6.jar && \
-    wget -P /opt/spark/jars https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.20.0/log4j-slf4j-impl-2.20.0.jar && \
-    # Kafka jar
-    wget -P /opt/spark/jars https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.13/4.0.1/spark-sql-kafka-0-10_2.13-4.0.1.jar
+COPY target/jars/* /opt/spark/jars/
 
 # ---------------------------
 # 6️⃣ Switch to spark user
