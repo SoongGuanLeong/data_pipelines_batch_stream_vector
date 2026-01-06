@@ -32,4 +32,3 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
 - [Apache Polaris](https://polaris.apache.org/) - REST catalog for Apache Iceberg (AWS Glue catalog substitute - metadata outside table)
 - [Postman](https://www.postman.com/) - API platform to work with APIs
 - [Apache Maven](https://maven.apache.org/) - jar build tool
-- [ABRiS](https://github.com/AbsaOSS/ABRiS) - Avro SerDe for Apache Spark structured APIs.
