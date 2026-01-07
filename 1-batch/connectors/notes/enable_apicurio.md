@@ -1,4 +1,4 @@
-#### 1. uncomment these lines in [docker compose](../docker/10_debezium_kafka_apicurio_akhq/docker-compose.yaml)
+#### 1. uncomment these lines in [docker compose](../../docker/10_debezium_kafka_apicurio_akhq/docker-compose.yaml)
 
 ```yaml
 - ENABLE_APICURIO_CONVERTERS=true
@@ -13,8 +13,7 @@
 - CONNECT_SCHEMA_NAME_ADJUSTMENT_MODE=avro
 ```
 
-Also, add these to the connector config [update file](../connectors/14-olist-postgres-connector-update.json)
-
+Also, add these to the connector config
 ```json
 "key.converter": "io.apicurio.registry.utils.converter.AvroConverter",
 "value.converter": "io.apicurio.registry.utils.converter.AvroConverter",
@@ -39,18 +38,18 @@ curl http://localhost:8083/connectors/olist-postgres/status
 ```
 - Make sure both connector and tasks are RUNNING
 
-#### 4. rerun everything in [test cdc](13_test_cdc.sql)
+#### 4. rerun everything in [test cdc](../../scripts/13_test_cdc.sql)
 - in AKHQ, make sure all new messages in all topics become binary (non human-readable)
-![binary](binary.png)
+![binary](../../scripts/binary.png)
 - in Apicurio Registry UI, check
   - topic-key: has only PK
-  ![key](key.png)
+  ![key](../../scripts/key.png)
   - topic-value: all columns of the table
-  ![value](value.png)
+  ![value](../../scripts/value.png)
 
 #### 5. Schema Evolution test
-- run one [schema change test](16_test_schema_evolution.sql)
+- run one [schema change test](../../scripts/14_test_schema_evolution.sql)
 - new column should appear in the registry
-![v2](v2.png)
-![schema_change](schema_change.png)
+![v2](../../scripts/v2.png)
+![schema_change](../../scripts/schema_change.png)
 - even if we drop the column afterwards, registry still remembers it as v2 history
