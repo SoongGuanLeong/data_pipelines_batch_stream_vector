@@ -4,7 +4,7 @@ This step corresponds to deploying the **Debezium Postgres connector** for the O
 
 ## Location
 
-The actual Docker Compose files are located [here](../connectors/12_deploy.sh).
+The actual deploy script is located [here](../connectors/12_deploy.sh).
 
 ## Usage
 ```bash

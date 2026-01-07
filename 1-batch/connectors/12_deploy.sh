@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+# IMPORTANT: This script is not PRODUCTION READY. It is intended for
+# demonstration and learning purposes only. Do not use it as-is in a production
+# environment.
+# PROD READY would require advanced shell scripting.
+
 # -e: exit immediately on error
 # -u: error on undefined variables
 # -o pipefail: fail if any command in a pipeline fails
