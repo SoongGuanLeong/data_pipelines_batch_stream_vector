@@ -1,4 +1,6 @@
-# Polaris Setup
+# Polaris Setup 101
+
+This doc record my learning experience of using Postman with polaris management API. If you are not interested, you can just use [this script](../../scripts/16_polaris_bootstrap.sh) generated which serves the same purpose.
 
 ### 1 - Install [Postman](https://www.postman.com/downloads/). Import my [saved collection](https://.postman.co/workspace/My-Workspace~f29b62ad-b11c-4c57-8947-1912bc804f26/collection/45905186-53ce3d85-f290-4e57-8015-f3250d66b879?action=share&creator=45905186) or you do it yourself from the steps below.
 
@@ -165,3 +167,5 @@
         ]
     }
   ```
+
+### 6 - Change the whole setup into a [script](../../scripts/16_polaris_bootstrap.sh).
