@@ -64,11 +64,11 @@
             <version>4.0.1</version>
         </dependency>
 
-        <!-- https://github.com/AbsaOSS/ABRiS -->
+        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
         <dependency>
-            <groupId>za.co.absa</groupId>
-            <artifactId>abris_2.13</artifactId>
-            <version>6.4.1</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.8</version>
         </dependency>
 
     </dependencies>

@@ -1,3 +1,7 @@
+# POST connector 101
+
+These are just some notes I wrote while first exploring CDC with & without Apicurio registry. Feel free to skip this part and just use the [script 12](../12_deploy.sh) provided if not interested.
+
 #### 1. check if debezium connect is reachable
 ```bash
 curl http://localhost:8083/
@@ -12,7 +16,7 @@ curl http://localhost:8083/
 ```bash
 curl -X POST http://localhost:8083/connectors \
   -H "Content-Type: application/json" \
-  -d @11-olist-postgres-connector.json
+  -d @olist-postgres-connector.json
 ```
 - -X: explicit HTTP method (POST / GET / PUT)
 - -H: HTTP header
@@ -37,7 +41,7 @@ curl http://localhost:8083/connectors/olist-postgres/status
 ```bash
 curl -X PUT http://localhost:8083/connectors/olist-postgres/config \
   -H "Content-Type: application/json" \
-  -d @11-olist-postgres-connector.json
+  -d @update-example.json
 ```
 
 #### 5 - view CDC events
@@ -77,7 +81,7 @@ kafka "op":
 
 #### 8. update connector to include SMT
 - include [SMT (single message transformation)](https://debezium.io/documentation/reference/stable/transformations/event-flattening.html) configs into the connector json 
-- refer [json file 14](14-olist-postgres-connector-update.json)
+- refer [update-example.json](../update-example.json)
 ```json
 "transforms": "unwrap",
 "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",

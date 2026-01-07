@@ -51,6 +51,6 @@ curl http://localhost:8083/connectors/olist-postgres/status
 #### 5. Schema Evolution test
 - run one [schema change test](16_test_schema_evolution.sql)
 - new column should appear in the registry
-![2nd_version](2nd_version.png)
+![v2](v2.png)
 ![schema_change](schema_change.png)
 - even if we drop the column afterwards, registry still remembers it as v2 history
