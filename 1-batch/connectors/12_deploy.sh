@@ -1,20 +1,31 @@
 #!/usr/bin/env bash
+# -e: exit immediately on error
+# -u: error on undefined variables
+# -o pipefail: fail if any command in a pipeline fails
 set -euo pipefail
 
 CONNECT_URL="http://localhost:8083"
 CONNECTOR_NAME="olist-postgres"
 CONNECTOR_CONFIG="olist-postgres-connector.json"
 
-echo "==> Checking Kafka Connect availability..."
+# curl -s: silent
+# -f: fail on HTTP error
+# >/dev/null: discard output
+echo "==> Checking Debezium Connect availability..."
 until curl -sf "$CONNECT_URL/" >/dev/null; do
-  echo "Kafka Connect not ready, retrying..."
+  echo "Debezium Connect not ready, retrying..."
   sleep 3
 done
-echo "Kafka Connect is up."
+echo "Debezium Connect is up."
 
+# for idempotency: delete if exists
+# -X: explicit HTTP method (POST / GET / PUT)
 echo "==> Removing existing connector if present..."
 curl -sf -X DELETE "$CONNECT_URL/connectors/$CONNECTOR_NAME" || true
 
+# -H: HTTP header
+# -d: data
+# @: get content from file
 echo "==> Creating Debezium connector..."
 curl -sf -X POST "$CONNECT_URL/connectors" \
   -H "Content-Type: application/json" \
@@ -23,6 +34,7 @@ curl -sf -X POST "$CONNECT_URL/connectors" \
 echo "==> Waiting for connector to start..."
 sleep 5
 
+# jq: Pipes to jq for readable JSON
 echo "==> Verifying connector status..."
 curl -sf "$CONNECT_URL/connectors/$CONNECTOR_NAME/status" | jq .
 
