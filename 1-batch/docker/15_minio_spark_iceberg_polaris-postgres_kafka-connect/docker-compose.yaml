@@ -62,8 +62,12 @@ services:
       dockerfile: Dockerfile
     container_name: spark
     depends_on:
-      - minio
-      - polaris
+      minio:
+        condition: service_started
+      polaris:
+        condition: service_started
+      polaris-bootstrap:
+        condition: service_completed_successfully
     ports:
       - 8084:8888   # Jupyter (8081, 8082, 8083 are used)
       - 4040:4040   # Spark UI
@@ -83,15 +87,13 @@ services:
       # - ./warehouse:/home/iceberg/warehouse (minio have persistent volume)
       - ./notebooks:/home/iceberg/notebooks
       - ./spark/conf:/opt/spark/conf
+      - ./shared:/shared
     # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
 
   # 4. Polaris (Iceberg REST catalog) 
   polaris:
     image: apache/polaris:1.2.0-incubating
     container_name: polaris
-    depends_on:
-      polaris-bootstrap:
-        condition: service_completed_successfully
     ports:
       - "8181:8181" # The API we will talk to
       - "8182:8182" # Admin/Management
@@ -147,6 +149,8 @@ services:
       QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/polaris
       QUARKUS_DATASOURCE_USERNAME: postgres
       QUARKUS_DATASOURCE_PASSWORD: postgres
+    volumes:
+      - ./shared:/shared
     command: 
       - "bootstrap"
       - "--realm=POLARIS"
@@ -162,8 +166,6 @@ services:
       - minio
     ports:
       - "8085:8085"
-    volumes:
-      - ./connect-plugins:/etc/kafka-connect/jars   # Iceberg connector JARs
     environment:
       CONNECT_BOOTSTRAP_SERVERS: "kafka:9092"
       CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
@@ -178,7 +180,6 @@ services:
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/jars"
 
 networks:
   default:

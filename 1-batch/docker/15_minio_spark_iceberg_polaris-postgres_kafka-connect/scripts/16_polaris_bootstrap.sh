@@ -6,6 +6,8 @@ set -euo pipefail
 # environment.
 # PROD READY would require advanced shell scripting.
 
+# After running this script, copy CLIENT_ID and CLIENT_SECRET and put them into spark-defaults.conf
+
 # ==============================================================
 # Define variables
 # ==============================================================
@@ -19,6 +21,7 @@ REALM="POLARIS"
 PRINCIPAL_NAME="spark_user"
 ROLE_NAME="spark_role"
 CATALOG_ROLE="catalog_admin"
+SHARED="../shared"
 
 # ==============================================================
 # Request Access Token
@@ -139,3 +142,24 @@ curl -s -X GET "$POLARIS_URL/api/management/v1/principal-roles/$ROLE_NAME/catalo
     -H "Accept: application/json" \
     -H "Authorization: Bearer $TOKEN"
 echo "==> Verification complete"
+
+# ==============================================================
+# Save Polaris credentials for Spark
+# ==============================================================
+echo "==> Writing Polaris credentials to $SHARED/polaris.env"
+
+# Use the values returned by the API
+POLARIS_CLIENT_ID=$(curl -s -X GET "$POLARIS_URL/api/management/v1/principals/$PRINCIPAL_NAME" \
+  -H "Authorization: Bearer $TOKEN" \
+  | jq -r '.principal.clientId')
+
+POLARIS_CLIENT_SECRET=$(curl -s -X GET "$POLARIS_URL/api/management/v1/principals/$PRINCIPAL_NAME/credentials" \
+  -H "Authorization: Bearer $TOKEN" \
+  | jq -r '.clientSecret')
+
+cat > $SHARED/polaris.env <<EOF
+POLARIS_CLIENT_ID=$POLARIS_CLIENT_ID
+POLARIS_CLIENT_SECRET=$POLARIS_CLIENT_SECRET
+EOF
+
+echo "==> Polaris credentials written to $SHARED/polaris.env"
