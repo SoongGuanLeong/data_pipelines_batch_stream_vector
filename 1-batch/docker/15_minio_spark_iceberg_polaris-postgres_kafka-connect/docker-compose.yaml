@@ -62,12 +62,8 @@ services:
       dockerfile: Dockerfile
     container_name: spark
     depends_on:
-      minio:
-        condition: service_started
-      polaris:
-        condition: service_started
-      polaris-bootstrap:
-        condition: service_completed_successfully
+      - minio
+      - polaris
     ports:
       - 8084:8888   # Jupyter (8081, 8082, 8083 are used)
       - 4040:4040   # Spark UI
@@ -87,7 +83,6 @@ services:
       # - ./warehouse:/home/iceberg/warehouse (minio have persistent volume)
       - ./notebooks:/home/iceberg/notebooks
       - ./spark/conf:/opt/spark/conf
-      - ./shared:/shared
     # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
 
   # 4. Polaris (Iceberg REST catalog) 
@@ -149,9 +144,7 @@ services:
       QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/polaris
       QUARKUS_DATASOURCE_USERNAME: postgres
       QUARKUS_DATASOURCE_PASSWORD: postgres
-    volumes:
-      - ./shared:/shared
-    command: 
+    command:
       - "bootstrap"
       - "--realm=POLARIS"
       - "--credential=POLARIS,admin,password123"

@@ -21,7 +21,6 @@ REALM="POLARIS"
 PRINCIPAL_NAME="spark_user"
 ROLE_NAME="spark_role"
 CATALOG_ROLE="catalog_admin"
-SHARED="../shared"
 
 # ==============================================================
 # Request Access Token
@@ -144,22 +143,21 @@ curl -s -X GET "$POLARIS_URL/api/management/v1/principal-roles/$ROLE_NAME/catalo
 echo "==> Verification complete"
 
 # ==============================================================
-# Save Polaris credentials for Spark
+# Save Polaris credentials for Spark - not working (removed)
 # ==============================================================
-echo "==> Writing Polaris credentials to $SHARED/polaris.env"
+# echo "==> Saving Polaris credentials to $SHARED/polaris.env"
 
-# Use the values returned by the API
-POLARIS_CLIENT_ID=$(curl -s -X GET "$POLARIS_URL/api/management/v1/principals/$PRINCIPAL_NAME" \
-  -H "Authorization: Bearer $TOKEN" \
-  | jq -r '.principal.clientId')
+# POLARIS_CLIENT_ID=$(curl -s -X GET "$POLARIS_URL/api/management/v1/principals/$PRINCIPAL_NAME" \
+#     -H "Authorization: Bearer $TOKEN" \
+#     | grep -oP '"clientId"\s*:\s*"\K[^"]+')
 
-POLARIS_CLIENT_SECRET=$(curl -s -X GET "$POLARIS_URL/api/management/v1/principals/$PRINCIPAL_NAME/credentials" \
-  -H "Authorization: Bearer $TOKEN" \
-  | jq -r '.clientSecret')
+# POLARIS_CLIENT_SECRET=$(curl -s -X GET "$POLARIS_URL/api/management/v1/principals/$PRINCIPAL_NAME/credentials" \
+#     -H "Authorization: Bearer $TOKEN" \
+#     | grep -oP '"clientSecret"\s*:\s*"\K[^"]+')
 
-cat > $SHARED/polaris.env <<EOF
-POLARIS_CLIENT_ID=$POLARIS_CLIENT_ID
-POLARIS_CLIENT_SECRET=$POLARIS_CLIENT_SECRET
-EOF
+# cat > "$SHARED/polaris.env" <<EOF
+# POLARIS_CLIENT_ID=$POLARIS_CLIENT_ID
+# POLARIS_CLIENT_SECRET=$POLARIS_CLIENT_SECRET
+# EOF
 
-echo "==> Polaris credentials written to $SHARED/polaris.env"
+# echo "==> Polaris credentials written to $SHARED/polaris.env"
