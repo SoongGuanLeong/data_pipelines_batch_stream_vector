@@ -7,7 +7,7 @@ This repository documents my learning journey in building three core types of da
 - vector db pipeline
 
 ## Batch Pipeline (Lakehouse)
-![ETL_pipeline](<ETL pipeline.png>)
+![ETL_pipeline](<ETL_pipeline.png>)
 OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attempting iceberg kafka sink connector)
 
 #### Dataset: 
