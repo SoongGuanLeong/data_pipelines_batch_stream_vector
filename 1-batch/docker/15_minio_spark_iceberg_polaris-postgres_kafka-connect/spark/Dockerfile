@@ -24,7 +24,7 @@ WORKDIR /home/spark
 # ---------------------------
 RUN apt-get update && \
     apt-get install -y python3-pip wget libsnappy-dev zlib1g-dev && \
-    pip3 install --no-cache-dir notebook findspark pyspark==4.0.1 boto3
+    pip3 install --no-cache-dir notebook findspark pyspark==4.0.1
 
 COPY target/jars/* /opt/spark/jars/
 
@@ -36,5 +36,5 @@ USER spark
 # Expose Jupyter port
 EXPOSE 8888
 
-# Default command: start jupyter notebook
+# Default command: start Jupyter Notebook
 CMD ["jupyter", "notebook", "--notebook-dir=/home/iceberg/notebooks", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
