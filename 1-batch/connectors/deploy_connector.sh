@@ -10,7 +10,7 @@
 # -o pipefail: fail if any command in a pipeline fails
 set -euo pipefail
 
-CONNECT_URL="http://localhost:8083"
+CONNECT_URL="http://connect:8083"
 CONNECTOR_NAME="olist-postgres"
 CONNECTOR_CONFIG="olist-postgres-connector.json"
 

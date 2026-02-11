@@ -1,12 +1,13 @@
 # 12_deploy_debezium_connector
 
-This step corresponds to deploying the **Debezium Postgres connector** for the Olist dataset.
+**IMPORTANT**: The deployment of this file is automated now inside the alpine curl image of [docker compose script 10](../docker/10_debezium_kafka_apicurio_akhq/docker-compose.yaml).
 
-## Location
+~~This step corresponds to deploying the **Debezium Postgres connector** for the Olist dataset.~~
 
-The actual deploy script is located [here](../connectors/12_deploy.sh).
+## ~~Location~~
 
-## Usage
-```bash
-./12_deploy.sh
-```
+~~The actual deploy script is located [here](../connectors/12_deploy.sh).~~
+
+## ~~Usage~~
+
+~~./12_deploy.sh~~

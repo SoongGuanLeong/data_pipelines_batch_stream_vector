@@ -15,8 +15,12 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
 [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce?resource=download)
 
 #### Tools used
-- [PostgreSQL 18](https://www.postgresql.org/download/) - OLTP DB
+
+##### Local PC
+- [PostgreSQL 18](https://www.postgresql.org/download/) - Source: OLTP DB
 - [Docker Compose](https://www.docker.com/) - To run multiple containers
+
+##### Ingestion Stack
 - [Debezium 3.4](https://quay.io/repository/debezium/connect) - To enable Change Data Capture CDC
   - [docs](https://debezium.io/)
 - [Apache Kafka 4.1.1 - Kraft](https://hub.docker.com/r/apache/kafka) - To handle message queues
@@ -25,6 +29,8 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
   - [docs](https://www.apicur.io/registry/docs/apicurio-registry/3.1.x/index.html)
 - [AKHQ 0.26.0](https://hub.docker.com/r/tchiotludo/akhq) - - Apache Kafka GUI
   - [docs](https://akhq.io/docs/)
+
+##### Analytics Stack
 - [Minio - RELEASE.2025-09-07T16-13-09Z-cpuv1](https://github.com/minio/minio) - S3 compatible storage
   - [docs](https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/root-credentials/)
 - [Minio Client (mc)](https://hub.docker.com/r/minio/mc)
