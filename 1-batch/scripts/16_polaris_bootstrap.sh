@@ -6,7 +6,8 @@ set -euo pipefail
 # environment.
 # PROD READY would require advanced shell scripting.
 
-# After running this script, copy CLIENT_ID and CLIENT_SECRET and put them into spark-defaults.conf
+# So for now we need to manually run this script, copy CLIENT_ID and CLIENT_SECRET and put them into spark-defaults.conf
+# and then restart the Spark service
 
 # ==============================================================
 # Define variables
