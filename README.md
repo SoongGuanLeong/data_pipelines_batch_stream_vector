@@ -29,6 +29,7 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
   - [docs](https://www.apicur.io/registry/docs/apicurio-registry/3.1.x/index.html)
 - [AKHQ 0.26.0](https://hub.docker.com/r/tchiotludo/akhq) - - Apache Kafka GUI
   - [docs](https://akhq.io/docs/)
+- [Alpine Curl](https://hub.docker.com/r/alpine/curl) - to deploy debezium connector automatically
 
 ##### Analytics Stack
 - [Minio - RELEASE.2025-09-07T16-13-09Z-cpuv1](https://github.com/minio/minio) - S3 compatible storage
