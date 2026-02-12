@@ -32,8 +32,8 @@ services:
     # https://www.apicur.io/registry/docs/apicurio-registry/3.1.x/getting-started/assembly-configuring-registry-security.html#registry-cors-configuration_registry
     image: quay.io/apicurio/apicurio-registry:3.1.6
     container_name: apicurio
-    # ports:
-    #   - "8081:8081"
+    ports:
+      - "8081:8081"
     environment:
       # https://github.com/Apicurio/apicurio-registry/blob/main/README.md
       # REMOVED APICURIO_STORAGE_KIND. Version 3.1.6 defaults to 'mem' automatically.
