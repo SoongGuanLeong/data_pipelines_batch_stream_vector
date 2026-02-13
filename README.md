@@ -31,7 +31,7 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
   - [docs](https://akhq.io/docs/)
 - [Alpine Curl](https://hub.docker.com/r/alpine/curl) - to deploy debezium connector automatically
 
-##### Analytics Stack
+##### Engineering Stack
 - [Minio - RELEASE.2025-09-07T16-13-09Z-cpuv1](https://github.com/minio/minio) - S3 compatible storage
   - [docs](https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/root-credentials/)
 - [Minio Client (mc)](https://hub.docker.com/r/minio/mc)
