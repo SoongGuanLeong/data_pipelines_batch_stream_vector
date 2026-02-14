@@ -1,7 +1,7 @@
 # Olist Data Pipeline Engineeering: Minio + Spark + Iceberg + Polaris (1.2.0-incubating)
 # https://iceberg.apache.org/docs/latest/
 # https://hadoop.apache.org/docs/stable/hadoop-aws/
-name: olist-modern-engineeering-stack
+name: olist-modern-engineering-stack
 
 services:
   # 1. Minio (S3 Compatible Storage) - if hardcore switch to Ceph or S3

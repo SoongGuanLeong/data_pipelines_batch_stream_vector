@@ -16,8 +16,9 @@
 
     "transforms": "unwrap",
     "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
-    "transforms.unwrap.drop.tombstones": "true",
+    "transforms.unwrap.drop.tombstones": "false",
     "transforms.unwrap.delete.handling.mode": "rewrite",
+    "transforms.unwrap.add.fields": "op,ts_ms",
 
     "key.converter": "io.apicurio.registry.utils.converter.AvroConverter",
     "value.converter": "io.apicurio.registry.utils.converter.AvroConverter",
