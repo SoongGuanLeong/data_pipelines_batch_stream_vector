@@ -9,8 +9,14 @@ services:
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
     ports:
       - "9200:9200"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    restart: unless-stopped
 
   # 2. Kibana - visualization and exploration tool
   kibana:
@@ -20,8 +26,11 @@ services:
       - "5601:5601"
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
 
-  # 3. Logstash - Log processing pipeline
+  # 3. Logstash - Log processing pipeline (Like Spark)
   logstash:
     image: elastic/logstash:8.19.11
     container_name: logstash
@@ -29,10 +38,26 @@ services:
       - ./logstash/pipeline/:/usr/share/logstash/pipeline/
     ports:
       - "5044:5044"  # beats input
+    environment:
+      - LS_JAVA_OPTS=-Xms512m -Xmx512m
     depends_on:
-      - elasticsearch 
+      - elasticsearch
+    restart: unless-stopped
+
+  # 4: Filebeat - Log Shipper (Like Kafka Producer)
+  filebeat:
+    image: elastic/filebeat:8.19.11
+    container_name: filebeat
+    user: root
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ../shared-logs:/logs
+    depends_on:
+      - logstash
+    command: ["--strict.perms=false"]
+    restart: unless-stopped
 
 networks:
   default:
     external: true
-    name: data-pipeline-net
+    name: data-pipeline-net 

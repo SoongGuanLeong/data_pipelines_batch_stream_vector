@@ -1,7 +1,7 @@
 # Olist Data Pipeline Engineeering: Minio + Spark + Iceberg + Polaris (1.2.0-incubating)
 # https://iceberg.apache.org/docs/latest/
 # https://hadoop.apache.org/docs/stable/hadoop-aws/
-name: olist-modern-engineering-stack
+name: olist-engineering-stack
 
 services:
   # 1. Minio (S3 Compatible Storage) - if hardcore switch to Ceph or S3
@@ -83,6 +83,7 @@ services:
       # - ./warehouse:/home/iceberg/warehouse (minio have persistent volume)
       - ./notebooks:/home/iceberg/notebooks
       - ./spark/conf:/opt/spark/conf
+      - ../shared-logs:/opt/spark/logs
     # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
 
   # 4. Polaris (Iceberg REST catalog) 
