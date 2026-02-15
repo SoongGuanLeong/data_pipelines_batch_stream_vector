@@ -1,4 +1,4 @@
-# Olist ELK Stack:: Elasticsearch + Logstash + Kibana
+# Olist ELK Stack:: Elasticsearch + Logstash + Kibana + Filebeat
 name: olist-elk-stack
 
 services:

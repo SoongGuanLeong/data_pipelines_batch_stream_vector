@@ -47,3 +47,4 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
 - [Apache Maven](https://maven.apache.org/) - jar build tool
 
 ##### ELK Stack - Logging and Monitoring
+
