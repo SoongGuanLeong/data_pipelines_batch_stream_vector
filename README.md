@@ -1,5 +1,9 @@
 # data_pipelines_batch_stream_vector
-This repository documents my learning journey in building three core types of data pipelines, serving as a single source of truth for my current understanding of modern Data Engineering practices. The focus is on making every component fully runnable in a local development environment to enable faster iteration, easier debugging, and reduce reliance on cloud infrastructure. While processing over 10 TB of data per day remains costly and uncommon today, I believe such large-scale pipelines will become increasingly relevant as LLMs continue to demand massive datasets.
+This repository captures my hands-on journey in building three core types of data pipelines, serving as a single source of truth for modern Data Engineering practices. All components are **fully runnable locally**, enabling fast iteration, easy debugging, and minimal reliance on cloud infrastructure.
+
+While processing over 10 TB of data per day remains costly and uncommon, such large-scale pipelines are increasingly relevant as LLMs drive demand for massive datasets.
+
+> **Note**: This project is fully open source and developed entirely with **free tools**—no Claude, no Cursor—only ChatGPT Free and other open-source software.
 
 # Pipeline Types
 - [batch pipeline](#batch-pipeline-lakehouse---micro-batch)
