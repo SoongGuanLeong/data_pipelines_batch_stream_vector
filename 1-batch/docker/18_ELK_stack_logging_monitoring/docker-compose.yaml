@@ -1,0 +1,38 @@
+# Olist ELK Stack:: Elasticsearch + Logstash + Kibana
+name: olist-elk-stack
+
+services:
+  # 1. Elasticsearch - search and analytics engine
+  elasticsearch:
+    image: elastic/elasticsearch:8.19.11
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+
+  # 2. Kibana - visualization and exploration tool
+  kibana:
+    image: elastic/kibana:8.19.11
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+  # 3. Logstash - Log processing pipeline
+  logstash:
+    image: elastic/logstash:8.19.11
+    container_name: logstash
+    volumes:
+      - ./logstash/pipeline/:/usr/share/logstash/pipeline/
+    ports:
+      - "5044:5044"  # beats input
+    depends_on:
+      - elasticsearch 
+
+networks:
+  default:
+    external: true
+    name: data-pipeline-net
