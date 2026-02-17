@@ -34,17 +34,35 @@ services:
     container_name: apicurio
     ports:
       - "8081:8081"
+    depends_on:
+      - apicurio-db
     environment:
       # https://github.com/Apicurio/apicurio-registry/blob/main/README.md
-      # REMOVED APICURIO_STORAGE_KIND. Version 3.1.6 defaults to 'mem' automatically.
       # https://quarkus.io/guides/all-config
       - QUARKUS_HTTP_PORT=8081
-      - QUARKUS_HTTP_CORS=true
+      - QUARKUS_HTTP_CORS_ENABLE=true
       - QUARKUS_HTTP_CORS_ORIGINS=http://localhost:8888
       - QUARKUS_HTTP_CORS_METHODS=GET,PUT,POST,PATCH,DELETE,OPTIONS
       - QUARKUS_HTTP_CORS_HEADERS=accept,authorization,content-type,x-requested-with,origin,referer,user-agent
+      - APICURIO_STORAGE_KIND=sql
+      - APICURIO_STORAGE_SQL_KIND=postgresql
+      - QUARKUS_DATASOURCE_POSTGRESQL_DB_KIND=postgresql
+      - QUARKUS_DATASOURCE_POSTGRESQL_JDBC_URL=jdbc:postgresql://apicurio-db:5432/apicurio
+      - QUARKUS_DATASOURCE_POSTGRESQL_USERNAME=apicurio
+      - QUARKUS_DATASOURCE_POSTGRESQL_PASSWORD=apicurio
+  
+  # 3. Apicurio Registry Database (PostgreSQL) - to persist schemas
+  apicurio-db:
+    image: postgres:14.21
+    container_name: apicurio-db
+    environment:
+      - POSTGRES_DB=apicurio
+      - POSTGRES_USER=apicurio
+      - POSTGRES_PASSWORD=apicurio
+    volumes:
+      - apicurio_db_data:/var/lib/postgresql/data
 
-  # 3. Apicurio Registry UI
+  # 4. Apicurio Registry UI
   apicurio-ui:
     image: quay.io/apicurio/apicurio-registry-ui:latest
     container_name: apicurio-ui
@@ -54,7 +72,7 @@ services:
       # https://github.com/Apicurio/apicurio-registry/blob/main/ui/README.md
       - REGISTRY_API_URL=http://localhost:8081/apis/registry/v3
 
-  # 4. Debezium Connect (The 'Engine' for CDC)
+  # 5. Debezium Connect (The 'Engine' for CDC)
   connect:
     image: quay.io/debezium/connect:3.4
     container_name: connect
@@ -95,7 +113,7 @@ services:
     volumes:
       - connect-data:/kafka-connect
 
-  # 5. Alpine curl (to deploy connectors automatically)
+  # 6. Alpine curl (to deploy connectors automatically)
   connector-init:
     image: alpine/curl:8.17.0
     depends_on:
@@ -105,7 +123,7 @@ services:
       - ../../connectors/olist-postgres-connector.json:/olist-postgres-connector.json
     entrypoint: ["sh", "/deploy_connector.sh"]
 
-  # 6. AKHQ (Apache Kafka GUI)
+  # 7. AKHQ (Apache Kafka GUI)
   akhq:
     image: tchiotludo/akhq:0.26.0
     container_name: akhq
@@ -141,3 +159,4 @@ networks:
 volumes:
   kafka-data:
   connect-data:
+  apicurio_db_data:
