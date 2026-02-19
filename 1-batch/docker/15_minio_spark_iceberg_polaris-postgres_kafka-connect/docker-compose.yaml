@@ -84,6 +84,7 @@ services:
       - ./notebooks:/home/iceberg/notebooks
       - ./spark/conf:/opt/spark/conf
       - ../shared-logs:/opt/spark/logs
+      - ../datasets:/opt/spark/datasets
     # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
 
   # 4. Polaris (Iceberg REST catalog) 
