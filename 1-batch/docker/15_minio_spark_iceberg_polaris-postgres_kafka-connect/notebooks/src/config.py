@@ -17,7 +17,7 @@ JOB_NAMES = {
     "init_lakehouse": f"{PROJECT}-init-lakehouse",
     "bronze_cdc_ddl": f"{PROJECT}-bronze-cdc-ddl",
     "bronze_cdc_ingestion_backfill": f"{PROJECT}-bronze-cdc-ingestion-backfill",
-    "bronze_cdc_ingestion_update": f"{PROJECT}-bronze-cdc-ingestion-update",
+    "bronze_cdc_ingestion_append": f"{PROJECT}-bronze-cdc-ingestion-append",
     "bronze_lookup_ddl_ingestion": f"{PROJECT}-bronze-lookup-ddl-ingestion",
 }
 
