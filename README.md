@@ -46,5 +46,5 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
 - [Postman](https://www.postman.com/) - API platform to work with APIs
 - [Apache Maven](https://maven.apache.org/) - jar build tool
 
-##### ELK Stack - Logging and Monitoring
+##### ELK Stack - Logging and Monitoring tool
 
