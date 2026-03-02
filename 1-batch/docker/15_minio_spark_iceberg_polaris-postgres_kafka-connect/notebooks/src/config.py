@@ -19,6 +19,7 @@ JOB_NAMES = {
     "bronze_cdc_ingestion_backfill": f"{PROJECT}-bronze-cdc-ingestion-backfill",
     "bronze_cdc_ingestion_append": f"{PROJECT}-bronze-cdc-ingestion-append",
     "bronze_lookup_ddl_ingestion": f"{PROJECT}-bronze-lookup-ddl-ingestion",
+    "silver": f"{PROJECT}-silver",
 }
 
 # ================================================================================
