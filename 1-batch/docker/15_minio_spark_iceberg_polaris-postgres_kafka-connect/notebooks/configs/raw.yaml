@@ -1,4 +1,5 @@
 raw_folder: raw
+raw_ingestion_path: /opt/spark/datasets
 allowed_types:
   - csv
   - json

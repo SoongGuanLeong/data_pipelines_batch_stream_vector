@@ -33,6 +33,7 @@ def log_ingestion_metadata(
     file_path: Path,
     spark_path: str,
     checksum: str,
+    allowed_types: set[str],
 ):
 
     # ---- Idempotency Guard ----
@@ -42,7 +43,7 @@ def log_ingestion_metadata(
 
     file_size = file_path.stat().st_size
     upload_ts = datetime.now(timezone.utc)
-    file_type = safe_file_type(file_path)
+    file_type = safe_file_type(file_path, allowed_types)
 
     metadata_df = spark.createDataFrame(
         [
