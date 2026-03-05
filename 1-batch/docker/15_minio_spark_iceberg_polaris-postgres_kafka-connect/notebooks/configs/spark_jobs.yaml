@@ -1,0 +1,8 @@
+jobs:
+  raw_ingestion: olist-raw-ingestion
+  init_lakehouse: olist-init-lakehouse
+  bronze_cdc_ddl: olist-bronze-cdc-ddl
+  bronze_cdc_ingestion_backfill: olist-bronze-cdc-ingestion-backfill
+  bronze_cdc_ingestion_append: olist-bronze-cdc-ingestion-append
+  bronze_lookup_ddl_ingestion: olist-bronze-lookup-ddl-ingestion
+  silver: olist-silver
