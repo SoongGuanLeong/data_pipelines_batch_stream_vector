@@ -24,7 +24,7 @@ WORKDIR /home/spark
 # ---------------------------
 RUN apt-get update && \
     apt-get install -y python3-pip wget libsnappy-dev zlib1g-dev && \
-    pip3 install --no-cache-dir notebook boto3 findspark pyspark==4.0.1
+    pip3 install --no-cache-dir notebook boto3 findspark pyspark==4.0.1 PyYAML==6.0.3
 
 COPY target/jars/* /opt/spark/jars/
 
