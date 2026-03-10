@@ -47,3 +47,26 @@ def normalize_column_names(df):
         new_cols.append(new)
 
     return df.toDF(*new_cols)
+
+
+def remove_control_characters(df: DataFrame, c: str) -> DataFrame:
+    """
+    Removes control characters from specified columns.
+    """
+    # This regex covers non-printable ASCII control characters
+    bad_chars_regex = r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]"
+
+    return df.withColumn(c, F.regexp_replace(F.col(c), bad_chars_regex, ""))
+
+
+def convert_accents(df: DataFrame, c: str) -> DataFrame:
+    # Source characters and their corresponding targets
+    # This is extremely fast because it happens in the JVM
+    return df.withColumn(
+        c,
+        F.translate(
+            F.col(c),
+            "áàâãäéèêëíìîïóòôõöúùûüçñÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇÑ",
+            "aaaaaeeeeiiiiooooouuuucnAAAAAEEEEIIIIOOOOOUUUUCN",
+        ),
+    )
