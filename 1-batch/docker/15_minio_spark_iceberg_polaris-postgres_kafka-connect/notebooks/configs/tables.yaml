@@ -1,9 +1,0 @@
-# this is not dbt
-tables:
-  - name: customers
-    primary_key: customer_id
-    partitioning:
-      transform: days
-      column: cdc_ts
-
-  
