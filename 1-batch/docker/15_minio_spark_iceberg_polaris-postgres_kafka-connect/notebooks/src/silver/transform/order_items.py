@@ -19,7 +19,7 @@ def transform_order_items(df: DataFrame) -> DataFrame:
         "seller_id",
     ]
     for c in trim_cols:
-        df = remove_control_characters(df, F.col(c))
+        df = remove_control_characters(df, c)
         df = df.withColumn(c, F.trim(F.col(c)))
 
     df = df.dropna(subset=trim_cols)

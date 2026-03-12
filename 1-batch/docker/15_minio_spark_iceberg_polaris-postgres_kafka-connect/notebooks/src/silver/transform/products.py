@@ -15,7 +15,7 @@ def transform_products(df: DataFrame) -> DataFrame:
     # String - remove ctrl chars, trim, not null (dropna/fillna), case format
     trim_cols = ["product_id", "product_category_name"]
     for c in trim_cols:
-        df = remove_control_characters(df, F.col(c))
+        df = remove_control_characters(df, c)
         df = df.withColumn(c, F.trim(F.col(c)))
 
     df = df.dropna(subset=["product_id"])

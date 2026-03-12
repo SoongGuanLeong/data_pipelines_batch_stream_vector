@@ -20,7 +20,7 @@ def transform_order_payments(df: DataFrame) -> DataFrame:
         "payment_type",
     ]
     for c in trim_cols:
-        df = remove_control_characters(df, F.col(c))
+        df = remove_control_characters(df, c)
         df = df.withColumn(c, F.trim(F.col(c)))
 
     df = df.dropna(subset=["order_id"])

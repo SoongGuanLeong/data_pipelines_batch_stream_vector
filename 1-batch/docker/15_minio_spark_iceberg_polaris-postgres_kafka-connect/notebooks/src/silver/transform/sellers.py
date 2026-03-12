@@ -21,7 +21,7 @@ def transform_sellers(df: DataFrame) -> DataFrame:
         "seller_state",
     ]
     for c in trim_cols:
-        df = remove_control_characters(df, F.col(c))
+        df = remove_control_characters(df, c)
         df = df.withColumn(c, F.trim(F.col(c)))
 
     df = df.dropna(subset=["seller_id"])
@@ -49,6 +49,6 @@ def transform_sellers(df: DataFrame) -> DataFrame:
     # string special handling - accents (not carry semantic meaning)
     accent_cols = ["seller_city", "seller_state"]
     for c in accent_cols:
-        df = convert_accents(df, F.col(c))
+        df = convert_accents(df, c)
 
     return df
