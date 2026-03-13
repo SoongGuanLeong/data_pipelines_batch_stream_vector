@@ -41,15 +41,18 @@ def transform_customers(df: DataFrame) -> DataFrame:
         df = df.withColumn(c, (F.col(c) / 1000000).cast("timestamp"))
         df = df.filter(F.col(c).between("2000-01-01", tomorrow))
 
+    # string special handling - accents (not carry semantic meaning)
+    accent_cols = ["customer_city", "customer_state"]
+    for c in accent_cols:
+        df = convert_accents(df, c)
+
     # id - not null (done in string part), dedup (we doing append model), length/regex
     id_cols = ["customer_id", "customer_unique_id"]
     # check if ids are md5
     for c in id_cols:
         df = df.filter(F.col(c).rlike("^[a-fA-F0-9]{32}$"))
 
-    # string special handling - accents (not carry semantic meaning)
-    accent_cols = ["customer_city", "customer_state"]
-    for c in accent_cols:
-        df = convert_accents(df, c)
+    # dedup if PK + time is the same
+    df = df.dropDuplicates(["customer_id", "cdc_ts"])
 
     return df
