@@ -1,5 +1,5 @@
-from pyspark.sql import DataFrame
-from pyspark.sql import functions as F
+from pyspark.sql import DataFrame, functions as F
+from .utils import write_dq_metrics
 
 
 def collect_order_items_dq_metrics(df: DataFrame, table_name: str) -> DataFrame:
@@ -29,13 +29,6 @@ def collect_order_items_dq_metrics(df: DataFrame, table_name: str) -> DataFrame:
     # dupes count - PK + time
     metrics.append((F.count("*") - F.count_distinct("order_id", "order_item_id", "cdc_ts")).alias("duplicate_count"))
 
-    metrics_df = df.agg(*metrics)
+    write_dq_metrics(df, metrics, table_name)
 
-    metrics_df = (
-        metrics_df.withColumn("pipeline_stage", F.lit("silver"))
-        .withColumn("source_table", F.lit(table_name))
-        .withColumn("timestamp", F.current_timestamp())
-    )
-
-    metrics_df.writeTo("monitoring.dq_metrics").append()
     return df
