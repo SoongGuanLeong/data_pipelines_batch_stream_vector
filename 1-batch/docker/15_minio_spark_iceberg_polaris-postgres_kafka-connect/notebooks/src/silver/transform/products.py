@@ -45,9 +45,7 @@ def transform_products(df: DataFrame) -> DataFrame:
 
     df = df.withColumn(
         "product_volume_cm3",
-        F.col("product_length_cm")
-        * F.col("product_height_cm")
-        * F.col("product_width_cm"),
+        F.col("product_length_cm") * F.col("product_height_cm") * F.col("product_width_cm"),
     )
 
     # timestamp - convert, invalid date
@@ -56,6 +54,12 @@ def transform_products(df: DataFrame) -> DataFrame:
     for c in microsecond_cols:
         df = df.withColumn(c, (F.col(c) / 1000000).cast("timestamp"))
         df = df.filter(F.col(c).between("2000-01-01", tomorrow))
+
+    # id - not null (done in string part), dedup (we doing append model), length/regex
+    id_cols = ["product_id"]
+    # check if ids are md5
+    for c in id_cols:
+        df = df.filter(F.col(c).rlike("^[a-fA-F0-9]{32}$"))
 
     # string special handling - accents (not needed here)
     return df

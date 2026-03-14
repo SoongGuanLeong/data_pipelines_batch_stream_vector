@@ -29,8 +29,8 @@ def transform_order_reviews(df: DataFrame) -> DataFrame:
     # Numeric - defensive casting, range check, not null (dropna/fillna), precision
     df = (
         df.withColumn("review_score", F.col("review_score").cast("integer"))
-        .filter(F.col("review_score").between(1, 5))
         .dropna(subset=["review_score"])
+        .filter(F.col("review_score").between(1, 5))
     )
 
     # timestamp - convert, invalid date

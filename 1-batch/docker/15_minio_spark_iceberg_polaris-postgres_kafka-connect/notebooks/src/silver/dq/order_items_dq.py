@@ -2,7 +2,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 
-def collect_sellers_dq_metrics(df: DataFrame, table_name: str) -> DataFrame:
+def collect_order_items_dq_metrics(df: DataFrame, table_name: str) -> DataFrame:
 
     metrics = []
 
