@@ -8,7 +8,7 @@ def collect_order_payments_dq_metrics(df: DataFrame, table_name: str) -> DataFra
 
     # order_id - not null, md5
     metrics.append(F.sum(F.col("order_id").isNull().cast("int")).alias("null_order_id"))
-    metrics.append(F.sum(~F.col("order_id").rlike("^[a-fA-F0-9]{32}$").cast("int")).alias("invalid_order_id"))
+    metrics.append(F.sum((~F.col("order_id").rlike("^[a-fA-F0-9]{32}$")).cast("int")).alias("invalid_order_id"))
     # payment_type - not N/A
     metrics.append(F.sum((F.col("payment_type") == "N/A").cast("int")).alias("invalid_payment_type"))
     # payment_value - >=0, not null

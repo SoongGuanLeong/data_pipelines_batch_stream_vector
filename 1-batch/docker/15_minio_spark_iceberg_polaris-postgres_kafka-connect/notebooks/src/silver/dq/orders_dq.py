@@ -10,7 +10,7 @@ def collect_orders_dq_metrics(df: DataFrame, table_name: str) -> DataFrame:
     id_cols = ["order_id", "customer_id"]
     for c in id_cols:
         metrics.append(F.sum(F.col(c).isNull().cast("int")).alias(f"null_{c}"))
-        metrics.append(F.sum(~F.col(c).rlike("^[a-fA-F0-9]{32}$").cast("int")).alias(f"invalid_{c}"))
+        metrics.append(F.sum((~F.col(c).rlike("^[a-fA-F0-9]{32}$")).cast("int")).alias(f"invalid_{c}"))
     # order_status - enum
     VALID_STATUSES = [
         "approved",
@@ -22,7 +22,7 @@ def collect_orders_dq_metrics(df: DataFrame, table_name: str) -> DataFrame:
         "shipped",
         "unavailable",
     ]
-    metrics.append(F.sum(~F.col("order_status").isin(VALID_STATUSES).cast("int")).alias("invalid_order_status"))
+    metrics.append(F.sum((~F.col("order_status").isin(VALID_STATUSES)).cast("int")).alias("invalid_order_status"))
 
     next_three_months = F.current_timestamp() + F.expr("INTERVAL 3 MONTHS")
     # order_purchase_timestamp, order_estimated_delivery_date - not null, limits

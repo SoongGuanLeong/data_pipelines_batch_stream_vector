@@ -10,7 +10,7 @@ def collect_products_dq_metrics(df: DataFrame, table_name: str) -> DataFrame:
     id_cols = ["product_id"]
     for c in id_cols:
         metrics.append(F.sum(F.col(c).isNull().cast("int")).alias(f"null_{c}"))
-        metrics.append(F.sum(~F.col(c).rlike("^[a-fA-F0-9]{32}$").cast("int")).alias(f"invalid_{c}"))
+        metrics.append(F.sum((~F.col(c).rlike("^[a-fA-F0-9]{32}$")).cast("int")).alias(f"invalid_{c}"))
 
     # product_category_name - N/A
     metrics.append(F.sum((F.col("product_category_name") == "N/A").cast("int")).alias("missing_product_category_name"))

@@ -10,7 +10,7 @@ def collect_order_reviews_dq_metrics(df: DataFrame, table_name: str) -> DataFram
     id_cols = ["review_id", "order_id"]
     for c in id_cols:
         metrics.append(F.sum(F.col(c).isNull().cast("int")).alias(f"null_{c}"))
-        metrics.append(F.sum(~F.col(c).rlike("^[a-fA-F0-9]{32}$").cast("int")).alias(f"invalid_{c}"))
+        metrics.append(F.sum((~F.col(c).rlike("^[a-fA-F0-9]{32}$")).cast("int")).alias(f"invalid_{c}"))
     # review_score - not null, isin(1,5)
     metrics.append(F.sum(F.col("review_score").isNull().cast("int")).alias("null_review_score"))
     metrics.append(F.sum((~F.col("review_score").between(1, 5)).cast("int")).alias("invalid_review_score"))

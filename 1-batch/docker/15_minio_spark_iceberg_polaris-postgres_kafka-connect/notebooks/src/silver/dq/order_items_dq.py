@@ -10,7 +10,7 @@ def collect_order_items_dq_metrics(df: DataFrame, table_name: str) -> DataFrame:
     id_cols = ["order_id", "product_id", "seller_id"]
     for c in id_cols:
         metrics.append(F.sum(F.col(c).isNull().cast("int")).alias(f"null_{c}"))
-        metrics.append(F.sum(~F.col(c).rlike("^[a-fA-F0-9]{32}$").cast("int")).alias(f"invalid_{c}"))
+        metrics.append(F.sum((~F.col(c).rlike("^[a-fA-F0-9]{32}$")).cast("int")).alias(f"invalid_{c}"))
 
     # order_item_id - not null, > 0
     metrics.append(F.sum(F.col("order_item_id").isNull().cast("int")).alias("null_order_item_id"))
