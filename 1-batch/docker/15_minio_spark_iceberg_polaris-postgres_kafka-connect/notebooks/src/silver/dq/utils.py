@@ -7,7 +7,7 @@ def write_dq_metrics(
     table_name: str,
     pipeline_stage: str = "silver",
     table: str = "monitoring.dq_metrics",
-) -> None:
+) -> DataFrame:
 
     metrics_df = df.agg(*metrics)
 
