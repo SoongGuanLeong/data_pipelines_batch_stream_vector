@@ -8,5 +8,6 @@ The actual Docker Compose files are located [here](../docker/10_debezium_kafka_a
 
 ## Usage
 ```pwsh
+docker network create data-pipeline-net
 docker compose up -d
 ```
