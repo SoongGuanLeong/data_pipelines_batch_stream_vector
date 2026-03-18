@@ -5,6 +5,8 @@ from .order_reviews import transform_order_reviews
 from .orders import transform_orders
 from .products import transform_products
 from .sellers import transform_sellers
+from .geolocation import transform_geolocation
+from .product_category_name import transform_product_category_name
 
 TABLE_TRANSFORMS = {
     "customers": transform_customers,
@@ -14,4 +16,6 @@ TABLE_TRANSFORMS = {
     "orders": transform_orders,
     "products": transform_products,
     "sellers": transform_sellers,
+    "geolocation": transform_geolocation,
+    "product_category_name": transform_product_category_name,
 }

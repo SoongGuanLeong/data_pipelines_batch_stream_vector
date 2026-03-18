@@ -26,9 +26,7 @@ def transform_customers(df: DataFrame) -> DataFrame:
         df = df.withColumn(c, F.trim(F.col(c)))
 
     df = df.dropna(subset=["customer_id", "customer_unique_id"])
-    df = df.fillna(
-        "N/A", subset=["customer_zip_code_prefix", "customer_city", "customer_state"]
-    )
+    df = df.fillna("N/A", subset=["customer_zip_code_prefix", "customer_city", "customer_state"])
 
     df = df.withColumn("customer_city", F.initcap(F.col("customer_city"))).withColumn(
         "customer_state", F.upper(F.col("customer_state"))
