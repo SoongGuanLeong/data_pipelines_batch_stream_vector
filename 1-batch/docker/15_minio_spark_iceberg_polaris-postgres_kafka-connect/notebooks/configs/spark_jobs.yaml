@@ -6,3 +6,4 @@ jobs:
   bronze_cdc_ingestion_append: olist-bronze-cdc-ingestion-append
   bronze_lookup_ddl_ingestion: olist-bronze-lookup-ddl-ingestion
   silver: olist-silver
+  gold: olist-gold

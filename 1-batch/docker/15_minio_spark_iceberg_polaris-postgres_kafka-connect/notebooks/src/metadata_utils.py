@@ -1,10 +1,11 @@
 from pathlib import Path
 from datetime import datetime, timezone
 from .file_utils import safe_file_type
+from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
 
-def ddl_metadata_table(spark, table_name: str):
+def ddl_metadata_table(spark: SparkSession, table_name: str):
     spark.sql(f"""
         CREATE TABLE IF NOT EXISTS {table_name} (
             file_name STRING,
@@ -20,15 +21,12 @@ def ddl_metadata_table(spark, table_name: str):
     print(f"{table_name} created.")
 
 
-def already_ingested(spark, table_name: str, checksum: str) -> bool:
-    return (
-        spark.table(table_name).filter(F.col("checksum") == checksum).limit(1).count()
-        > 0
-    )
+def already_ingested(spark: SparkSession, table_name: str, checksum: str) -> bool:
+    return spark.table(table_name).filter(F.col("checksum") == checksum).limit(1).count() > 0
 
 
 def log_ingestion_metadata(
-    spark,
+    spark: SparkSession,
     table_name: str,
     file_path: Path,
     spark_path: str,
