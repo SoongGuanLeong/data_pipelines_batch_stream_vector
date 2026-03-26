@@ -7,3 +7,6 @@ from .storage_utils import *
 from .transform_utils import *
 from .watermark import *
 from .writers import *
+
+from .gold import *
+from .silver import *

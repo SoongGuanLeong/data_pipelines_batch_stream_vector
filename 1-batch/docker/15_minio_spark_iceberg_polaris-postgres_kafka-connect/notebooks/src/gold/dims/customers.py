@@ -3,37 +3,16 @@ from pyspark.sql import functions as F, Window as W
 
 
 # =========================================================
-# Core transformation (FULL build)
+# Core build logic (hidden helper)
 # =========================================================
-def build_dim_customers_scd2(
-    spark: SparkSession,
-    customers_table: str,
-    geolocation_table: str,
-) -> DataFrame:
+def _build_dim_customers_core(customers: DataFrame, geolocation: DataFrame) -> DataFrame:
     """
-    Build full SCD2 dimension for customers (stateless).
-
-    Parameters
-    ----------
-    spark : SparkSession
-    customers_table : str
-        Source silver customers table
-    geolocation_table : str
-        Lookup table for geolocation
-
-    Returns
-    -------
-    DataFrame
-        SCD2 dimension DataFrame
+    Core logic to build dim_customers DataFrame
     """
-
-    c = spark.table(customers_table)
-    geo = spark.table(geolocation_table)
-
     df = (
-        c.alias("c")
+        customers.alias("c")
         .join(
-            geo.alias("g"),
+            geolocation.alias("g"),
             F.col("c.customer_zip_code_prefix") == F.col("g.geolocation_zip_code_prefix"),
             "left",
         )
@@ -49,8 +28,21 @@ def build_dim_customers_scd2(
             F.col("c.spark_ingest_ts"),
         )
     )
-
     return _apply_scd2_logic(df)
+
+
+# =========================================================
+# FULL build
+# =========================================================
+def build_dim_customers_scd2(
+    spark: SparkSession,
+    customers_table: str,
+    geolocation_table: str,
+) -> DataFrame:
+
+    customers = spark.table(customers_table)
+    geo = spark.table(geolocation_table)
+    return _build_dim_customers_core(customers, geo)
 
 
 # =========================================================
@@ -62,41 +54,10 @@ def build_incremental_dim_customers(
     geolocation_table: str,
     changed_customer_ids: DataFrame,
 ) -> DataFrame:
-    """
-    Build SCD2 dimension ONLY for affected customer_ids.
 
-    IMPORTANT:
-    - Pulls FULL history for those customers
-    - Required for correct SCD2 interval computation
-    """
-
-    c = spark.table(customers_table)
+    customers = spark.table(customers_table).join(changed_customer_ids, "customer_id", "inner")
     geo = spark.table(geolocation_table)
-
-    # 🔑 restrict to affected keys, but keep full history
-    c = c.join(changed_customer_ids, "customer_id", "inner")
-
-    df = (
-        c.alias("c")
-        .join(
-            geo.alias("g"),
-            F.col("c.customer_zip_code_prefix") == F.col("g.geolocation_zip_code_prefix"),
-            "left",
-        )
-        .select(
-            F.col("c.customer_id"),
-            F.col("c.customer_unique_id"),
-            F.col("c.customer_zip_code_prefix"),
-            F.col("c.customer_city"),
-            F.col("c.customer_state"),
-            F.col("g.geolocation_lat"),
-            F.col("g.geolocation_lng"),
-            F.col("c.cdc_ts"),
-            F.col("c.spark_ingest_ts"),
-        )
-    )
-
-    return _apply_scd2_logic(df)
+    return _build_dim_customers_core(customers, geo)
 
 
 # =========================================================

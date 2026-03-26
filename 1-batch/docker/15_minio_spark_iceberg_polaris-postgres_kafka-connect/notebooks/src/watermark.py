@@ -14,19 +14,15 @@ def get_last_commit_ts(
 
     Returns None if table is empty or does not exist.
     """
-
-    try:
-        df = spark.sql(f"""
-            SELECT max(committed_at) AS ts
-            FROM {target_table}.snapshots
-        """)
-
-        result = df.collect()[0]["ts"]
-        return result
-
-    except Exception:
-        # table might not exist yet (first run)
+    if not spark.catalog.tableExists(target_table):
         return None
+
+    snapshots_table = f"{target_table}.snapshots"
+
+    if not spark.catalog.tableExists(snapshots_table):
+        return None
+
+    return spark.table(snapshots_table).agg(F.max("committed_at").alias("ts")).collect()[0]["ts"]
 
 
 # =========================================================
@@ -45,7 +41,7 @@ def get_effective_watermark(
     if last_commit_ts is None:
         return None
 
-    return F.lit(last_commit_ts) - F.expr(f"INTERVAL {buffer_hours} HOURS")
+    return F.lit(last_commit_ts).cast("timestamp") - F.expr(f"INTERVAL {buffer_hours} HOURS")
 
 
 # =========================================================

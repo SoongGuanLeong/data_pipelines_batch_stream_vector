@@ -1,15 +1,23 @@
-dim_dates:
-
+dim_date:
+  target_table: polaris.gold.dim_date
+  start_date: "2010-01-01"
+  end_date: "2049-12-31"
 dim_customers_scd2:
   target_table: polaris.gold.dim_customers_scd2
   source_table: polaris.silver.customers
-  geo_table: polaris.silver.geolocations
+  geo_table: polaris.silver.geolocation
   buffer_hours: 6
   key_column: customer_id
 
 dim_products:
 dim_sellers:
 fact_orders:
+  target_table: polaris.gold.fact_orders
+  source_table: polaris.silver.orders
+  customers_table: polaris.gold.dim_customers_scd2
+  date_table: polaris.gold.dim_date
+  buffer_hours: 6
+  key_column: order_id
 fact_order_items:
 fact_order_payments:
 fact_order_reviews:

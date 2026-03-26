@@ -135,9 +135,10 @@ erDiagram
         integer quarter
         integer month
         integer day
-        integer weekday
+        integer day_of_week
+        string  day_name
+        integer week_of_year
         integer is_weekend
-        integer is_holiday
     }
 
     DIM_CUSTOMERS ||--o{ FACT_ORDERS : ""
