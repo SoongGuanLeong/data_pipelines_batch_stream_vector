@@ -31,7 +31,7 @@ Because I'm kinda new so I made the plan out first.
 ```mermaid
 erDiagram
     DIM_CUSTOMERS {
-        integer customer_sk PK
+        string customer_sk PK
         string customer_id
         string customer_unique_id
         string customer_zip_code_prefix
@@ -43,7 +43,7 @@ erDiagram
 
     FACT_ORDERS {
         string order_id PK
-        integer customer_sk FK
+        string customer_sk FK
         string customer_id
         string order_status
         integer order_purchase_date_sk FK
@@ -58,9 +58,9 @@ erDiagram
     FACT_ORDER_ITEMS {
         string order_id PK
         integer order_item_id PK
-        integer product_sk FK
-        integer seller_sk FK
-        integer customer_sk FK
+        string product_sk FK
+        string seller_sk FK
+        string customer_sk FK
         string product_id
         string seller_id
         string customer_id
@@ -83,7 +83,7 @@ erDiagram
         string payment_type
         integer payment_installments
         decimal payment_value
-        integer customer_sk FK
+        string customer_sk FK
         string customer_id
         integer order_purchase_date_sk FK
         timestamp order_purchase_timestamp
@@ -104,7 +104,7 @@ erDiagram
     }
 
     DIM_PRODUCTS {
-        integer product_sk PK
+        string product_sk PK
         string product_id 
         string product_category_name
         string product_category_name_english
@@ -119,7 +119,7 @@ erDiagram
     }
 
     DIM_SELLERS {
-        integer seller_sk PK
+        string seller_sk PK
         string seller_id
         string seller_zip_code_prefix
         string seller_city

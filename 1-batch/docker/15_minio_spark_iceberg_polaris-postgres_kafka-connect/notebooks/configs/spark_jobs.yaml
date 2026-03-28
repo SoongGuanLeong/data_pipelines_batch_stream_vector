@@ -7,5 +7,8 @@ jobs:
   bronze_lookup_ddl_ingestion: olist-bronze-lookup-ddl-ingestion
   silver: olist-silver
   gold_customers: olist-gold-customers
+  gold_sellers: olist-gold-sellers
+  gold_products: olist-gold-products
   gold_date: olist-gold-date
+  gold_dims_bootstrap: olist-gold-dims-bootstrap
   gold_orders: olist-gold-orders
