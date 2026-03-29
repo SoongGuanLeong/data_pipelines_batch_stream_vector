@@ -63,7 +63,7 @@ Assumption: PostgreSQL is already installed and running on your local machine.
    ```
 4. cd into the path where ingestion stack [docker-compose.yaml](./1-batch/docker/11_debezium_kafka_apicurio_akhq/docker-compose.yaml) is located, then run the docker container. Refer [this link](https://github.com/SoongGuanLeong/docker-beginner-tutorial-followalong) for commonly used docker commands.
    ```bash
-   cd docker/11_debezium_kafka_apicurio_akhq/docker-compose.yaml
+   cd docker/11_debezium_kafka_apicurio_akhq
    docker network create data-pipeline-net
    docker compose up -d
    ```
