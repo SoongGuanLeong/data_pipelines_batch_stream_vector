@@ -15,16 +15,16 @@ While processing over 10 TB of data per day remains costly and uncommon, such la
 
 OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attempting iceberg kafka sink connector)
 
-#### Dataset: 
+### Dataset: 
 [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce?resource=download)
 
-#### Tools used
+### Tools used
 
-##### Local PC
+#### Local PC
 - [PostgreSQL 18](https://www.postgresql.org/download/) - Source: OLTP DB
 - [Docker Compose](https://www.docker.com/) - To run multiple containers
 
-##### Ingestion Stack
+#### Ingestion Stack
 - [Debezium 3.4](https://quay.io/repository/debezium/connect) - To enable Change Data Capture CDC
   - [docs](https://debezium.io/)
 - [Apache Kafka 4.1.1 - Kraft](https://hub.docker.com/r/apache/kafka) - To handle message queues
@@ -35,7 +35,7 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
   - [docs](https://akhq.io/docs/)
 - [Alpine Curl](https://hub.docker.com/r/alpine/curl) - to deploy debezium connector automatically
 
-##### Engineering Stack
+#### Engineering Stack
 - [Minio - RELEASE.2025-09-07T16-13-09Z-cpuv1](https://github.com/minio/minio) - S3 compatible storage
   - [docs](https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/root-credentials/)
 - [Minio Client (mc)](https://hub.docker.com/r/minio/mc)
@@ -46,5 +46,36 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
 - [Postman](https://www.postman.com/) - API platform to work with APIs
 - [Apache Maven](https://maven.apache.org/) - jar build tool
 
-##### ELK Stack - Logging and Monitoring tool
+#### ELK Stack - Logging and Monitoring tool
+
+### Quickstart (Local PostgreSQL + Makefile)
+
+Assumption: PostgreSQL is already installed and running on your local machine.
+
+1. Put the Olist CSV files under `1-batch/docker/datasets/` (default), or pass a custom `DATASET_DIR`.
+2. Export your PostgreSQL password so `psql` can connect non-interactively:
+   ```bash
+   export PGPASSWORD='your_postgres_password'
+   ```
+3. Run the full bootstrap:
+   ```bash
+   make setup-all DB_USER=postgres DB_NAME=olist DB_HOST=localhost DB_PORT=5432
+   ```
+4. Enable CDC publication:
+   ```bash
+   make create-publication DB_USER=postgres DB_NAME=olist
+   ```
+
+Useful overrides:
+```bash
+make load-staging DATASET_DIR=/absolute/path/to/1-batch/docker/datasets DB_USER=postgres DB_NAME=olist
+```
+
+To see all targets:
+```bash
+make help
+```
+
+
+If `DATASET_DIR` is omitted, `07_load_staging.sql` will default to `$PWD/1-batch/docker/atasets`.
 

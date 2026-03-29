@@ -1,67 +1,88 @@
-\set ON_ERROR_STOP on
+-- Usage (direct):
+-- psql -d olist -v dataset_dir="/absolute/path/to/1-batch/dataset" -f 1-batch/scripts/07_load_staging.sql
+--
+-- Usage (with Makefile):
+-- make load-staging DATASET_DIR=/absolute/path/to/1-batch/dataset
+
+-- If dataset_dir is not passed, default to <current_working_directory>/docker/dataset.
+-- assuming project root is where Makefile is located
+\if :{?dataset_dir}
+\else
+\getenv dataset_dir PWD
+\set dataset_dir :dataset_dir '/docker/dataset'
+\endif
+
+\echo Using dataset_dir= :dataset_dir
+
+\set customers_csv :dataset_dir '/olist_customers_dataset.csv'
+\set geolocations_csv :dataset_dir '/olist_geolocation_dataset.csv'
+\set sellers_csv :dataset_dir '/olist_sellers_dataset.csv'
+\set categories_csv :dataset_dir '/product_category_name_translation.csv'
+\set products_csv :dataset_dir '/olist_products_dataset.csv'
+\set orders_csv :dataset_dir '/olist_orders_dataset.csv'
+\set order_items_csv :dataset_dir '/olist_order_items_dataset.csv'
+\set order_payments_csv :dataset_dir '/olist_order_payments_dataset.csv'
+\set order_reviews_csv :dataset_dir '/olist_order_reviews_dataset.csv'
+
 SET client_min_messages TO WARNING;
 
-\set data_dir '../docker/datasets'
-
+-- optional cleanup before reload (idempotent reruns)
 BEGIN;
+TRUNCATE TABLE IF EXISTS staging.customers;
+TRUNCATE TABLE IF EXISTS staging.geolocations_enrichment;
+TRUNCATE TABLE IF EXISTS staging.sellers;
+TRUNCATE TABLE IF EXISTS staging.product_categories;
+TRUNCATE TABLE IF EXISTS staging.products;
+TRUNCATE TABLE IF EXISTS staging.orders;
+TRUNCATE TABLE IF EXISTS staging.order_items;
+TRUNCATE TABLE IF EXISTS staging.order_payments;
+TRUNCATE TABLE IF EXISTS staging.order_reviews;
+COMMIT;
 
 -- customers - 99441 rows
-TRUNCATE TABLE staging.customers;
 COPY staging.customers
-FROM :'data_dir'/olist_customers_dataset.csv
+FROM :'customers_csv'
 WITH (FORMAT csv, HEADER true);
 
 -- Geolocations (optional enrichment) - 1000163 rows
-TRUNCATE TABLE staging.geolocations_enrichment;
 COPY staging.geolocations_enrichment
-FROM :'data_dir'/olist_geolocation_dataset.csv
+FROM :'geolocations_csv'
 WITH (FORMAT csv, HEADER true);
 
 -- Sellers - 3095 rows
-TRUNCATE TABLE staging.sellers;
 COPY staging.sellers
-FROM :'data_dir'/olist_sellers_dataset.csv
+FROM :'sellers_csv'
 WITH (FORMAT csv, HEADER true);
 
 -- Product Categories - 71 rows
-TRUNCATE TABLE staging.product_categories;
 COPY staging.product_categories
-FROM :'data_dir'/product_category_name_translation.csv
+FROM :'categories_csv'
 WITH (FORMAT csv, HEADER true);
 
 -- Products - 32951 rows
-TRUNCATE TABLE staging.products;
 COPY staging.products
-FROM :'data_dir'/olist_products_dataset.csv
+FROM :'products_csv'
 WITH (FORMAT csv, HEADER true);
 
 -- Orders - 99441 rows
-TRUNCATE TABLE staging.orders;
 COPY staging.orders
-FROM :'data_dir'/olist_orders_dataset.csv
+FROM :'orders_csv'
 WITH (FORMAT csv, HEADER true);
 
 -- Order Items - 112650 rows
-TRUNCATE TABLE staging.order_items;
 COPY staging.order_items
-FROM :'data_dir'/olist_order_items_dataset.csv
+FROM :'order_items_csv'
 WITH (FORMAT csv, HEADER true);
 
 -- Order Payments - 103886 rows
-TRUNCATE TABLE staging.order_payments;
 COPY staging.order_payments
-FROM :'data_dir'/olist_order_payments_dataset.csv
+FROM :'order_payments_csv'/
 WITH (FORMAT csv, HEADER true);
 
 -- Order Reviews - 104719 rows (only this is different - 99224, some rows are empty)
-TRUNCATE TABLE staging.order_reviews;
 COPY staging.order_reviews
-FROM :'data_dir'/olist_order_reviews_dataset.csv
+FROM :'order_reviews_csv'
 WITH (FORMAT csv, HEADER true);
-
-COMMIT;
-
-ANALYZE staging;
 
 -- post-load check
 SELECT * FROM (
@@ -84,3 +105,5 @@ SELECT * FROM (
     SELECT 'order_reviews', COUNT(*) FROM staging.order_reviews;
 ) t
 ORDER BY table_name;
+
+ANALYZE staging;
