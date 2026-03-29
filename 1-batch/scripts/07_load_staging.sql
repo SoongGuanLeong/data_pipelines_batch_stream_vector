@@ -28,15 +28,15 @@ SET client_min_messages TO WARNING;
 
 -- optional cleanup before reload (idempotent reruns)
 BEGIN;
-TRUNCATE TABLE IF EXISTS staging.customers;
-TRUNCATE TABLE IF EXISTS staging.geolocations_enrichment;
-TRUNCATE TABLE IF EXISTS staging.sellers;
-TRUNCATE TABLE IF EXISTS staging.product_categories;
-TRUNCATE TABLE IF EXISTS staging.products;
-TRUNCATE TABLE IF EXISTS staging.orders;
-TRUNCATE TABLE IF EXISTS staging.order_items;
-TRUNCATE TABLE IF EXISTS staging.order_payments;
-TRUNCATE TABLE IF EXISTS staging.order_reviews;
+TRUNCATE TABLE staging.customers;
+TRUNCATE TABLE staging.geolocations_enrichment;
+TRUNCATE TABLE staging.sellers;
+TRUNCATE TABLE staging.product_categories;
+TRUNCATE TABLE staging.products;
+TRUNCATE TABLE staging.orders;
+TRUNCATE TABLE staging.order_items;
+TRUNCATE TABLE staging.order_payments;
+TRUNCATE TABLE staging.order_reviews;
 COMMIT;
 
 -- customers - 99441 rows
@@ -76,7 +76,7 @@ WITH (FORMAT csv, HEADER true);
 
 -- Order Payments - 103886 rows
 COPY staging.order_payments
-FROM :'order_payments_csv'/
+FROM :'order_payments_csv'
 WITH (FORMAT csv, HEADER true);
 
 -- Order Reviews - 104719 rows (only this is different - 99224, some rows are empty)
@@ -102,8 +102,16 @@ SELECT * FROM (
     UNION ALL
     SELECT 'order_payments', COUNT(*) FROM staging.order_payments
     UNION ALL
-    SELECT 'order_reviews', COUNT(*) FROM staging.order_reviews;
+    SELECT 'order_reviews', COUNT(*) FROM staging.order_reviews
 ) t
 ORDER BY table_name;
 
-ANALYZE staging;
+ANALYZE staging.customers;
+ANALYZE staging.geolocations_enrichment;
+ANALYZE staging.sellers;
+ANALYZE staging.product_categories;
+ANALYZE staging.products;
+ANALYZE staging.orders;
+ANALYZE staging.order_items;
+ANALYZE staging.order_payments;
+ANALYZE staging.order_reviews

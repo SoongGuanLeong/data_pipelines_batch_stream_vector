@@ -25,7 +25,7 @@ BEGIN
             oltp.order_payments, 
             oltp.order_reviews;
     END IF;
-END$$
+END $$;
 
 -- verify
 SELECT pubname FROM pg_publication;

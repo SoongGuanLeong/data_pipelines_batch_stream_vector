@@ -52,21 +52,23 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
 
 Assumption: PostgreSQL is already installed and running on your local machine.
 
-1. Put the Olist CSV files under `1-batch/docker/datasets/` (default), or pass a custom `DATASET_DIR`.
+1. Clone this repo. Put the Olist CSV files under `1-batch/docker/datasets/` (default), or pass a custom `DATASET_DIR`.
 2. Export your PostgreSQL password so `psql` can connect non-interactively:
    ```bash
    export PGPASSWORD='your_postgres_password'
    ```
-3. Run the postgres bootstrap:
+3. cd into the path where [Makefile](./1-batch/Makefile) is located. Run the postgres bootstrap:
    ```bash
    make setup-postgres DB_USER=postgres DB_NAME=olist DB_HOST=localhost DB_PORT=5432
    ```
-4. Setup CDC ingestion stack:
+4. cd into the path where ingestion stack [docker-compose.yaml](./1-batch/docker/11_debezium_kafka_apicurio_akhq/docker-compose.yaml) is located, then run the docker container. Refer [this link](https://github.com/SoongGuanLeong/docker-beginner-tutorial-followalong) for commonly used docker commands.
    ```bash
-   make ingestion-stack
+   cd docker/11_debezium_kafka_apicurio_akhq/docker-compose.yaml
+   docker network create data-pipeline-net
+   docker compose up -d
    ```
 
-5. Test if CDC is working. Check at AKHQ UI:
+5. Test if CDC is working. Check at AKHQ UI if there is new messages that come in after we run the test:
    ```bash
    make test-cdc
    ```

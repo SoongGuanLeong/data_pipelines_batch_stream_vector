@@ -14,10 +14,10 @@
 --     REFERENCES oltp.geolocations_enrichment(geolocation_zip_code_prefix);
 
 -- products - product_categories
-ALTER TABLE oltp.products
-    ADD CONSTRAINT fk_product_category
-    FOREIGN KEY (product_category_name) 
-    REFERENCES oltp.product_categories(product_category_name);
+-- ALTER TABLE oltp.products
+--     ADD CONSTRAINT fk_product_category
+--     FOREIGN KEY (product_category_name) 
+--     REFERENCES oltp.product_categories(product_category_name);
 
 -- orders - customers
 ALTER TABLE oltp.orders
