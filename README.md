@@ -77,12 +77,5 @@ Useful overrides:
 ```bash
 make load-staging DATASET_DIR=/absolute/path/to/1-batch/docker/datasets DB_USER=postgres DB_NAME=olist
 ```
-
-To see all targets:
-```bash
-make help
-```
-
-
 If `DATASET_DIR` is omitted, `07_load_staging.sql` will default to `$PWD/1-batch/docker/datasets`.
 
