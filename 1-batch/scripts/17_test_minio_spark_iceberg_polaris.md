@@ -1,6 +1,6 @@
 # 17_test_minio_spark_iceberg_polaris
 
-This step corresponds to the jupyter notebook file created to test if the analytics stack in script 15 is working properly.
+This step corresponds to the jupyter notebook file created to test if the engineering stack in script 15 is working properly.
 
 ## Location
 

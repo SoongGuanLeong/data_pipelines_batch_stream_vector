@@ -57,13 +57,18 @@ Assumption: PostgreSQL is already installed and running on your local machine.
    ```bash
    export PGPASSWORD='your_postgres_password'
    ```
-3. Run the full bootstrap:
+3. Run the postgres bootstrap:
    ```bash
-   make setup-all DB_USER=postgres DB_NAME=olist DB_HOST=localhost DB_PORT=5432
+   make setup-postgres DB_USER=postgres DB_NAME=olist DB_HOST=localhost DB_PORT=5432
    ```
-4. Enable CDC publication:
+4. Setup CDC ingestion stack:
    ```bash
-   make create-publication DB_USER=postgres DB_NAME=olist
+   make ingestion-stack
+   ```
+
+5. Test if CDC is working. Check at AKHQ UI:
+   ```bash
+   make test-cdc
    ```
 
 Useful overrides:
@@ -77,5 +82,5 @@ make help
 ```
 
 
-If `DATASET_DIR` is omitted, `07_load_staging.sql` will default to `$PWD/1-batch/docker/atasets`.
+If `DATASET_DIR` is omitted, `07_load_staging.sql` will default to `$PWD/1-batch/docker/datasets`.
 
