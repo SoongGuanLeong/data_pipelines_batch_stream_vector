@@ -22,3 +22,5 @@ TABLE_DQ_METRICS = {
     "geolocation": collect_geolocation_dq_metrics,
     "product_category_name": collect_product_category_name_dq_metrics,
 }
+
+__all__ = ["collect_common_dq_metrics", "write_dq_metrics"]
