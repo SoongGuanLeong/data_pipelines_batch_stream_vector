@@ -1,6 +1,5 @@
 from .file_utils import safe_file_type
 from pathlib import Path
-from datetime import datetime
 
 
 def get_spark_path(

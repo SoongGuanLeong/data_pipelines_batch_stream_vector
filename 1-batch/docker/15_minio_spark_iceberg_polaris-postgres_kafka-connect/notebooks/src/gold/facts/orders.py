@@ -1,5 +1,7 @@
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql import functions as F, Window as W
+from pyspark.sql import functions as F
+
+# from pyspark.sql import Window as W
 from src.watermark import get_changed_keys
 
 
