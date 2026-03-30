@@ -52,7 +52,6 @@ help:
 	@echo "  create-publication  - Create Debezium publication"
 	@echo "  prep-cdc            - Prepare postgres for CDC"
 	@echo "  setup-postgres      - Run postgres setup in correct order"
-	@echo "  ingestion-stack     - Docker compose up CDC ingestion stack"
 	@echo "  test-cdc            - Test if CDC is working"
 	@echo ""
 	@echo "Variables (override like: make setup-postgres DB_USER=postgres DATASET_DIR=/path/to/csvs):"

@@ -48,23 +48,23 @@ services:
       - APICURIO_STORAGE_SQL_KIND=postgresql
       - QUARKUS_DATASOURCE_POSTGRESQL_DB_KIND=postgresql
       - QUARKUS_DATASOURCE_POSTGRESQL_JDBC_URL=jdbc:postgresql://apicurio-db:5432/apicurio
-      - QUARKUS_DATASOURCE_POSTGRESQL_USERNAME=apicurio
-      - QUARKUS_DATASOURCE_POSTGRESQL_PASSWORD=apicurio
-  
+      - QUARKUS_DATASOURCE_POSTGRESQL_USERNAME=${APICURIO_USER}
+      - QUARKUS_DATASOURCE_POSTGRESQL_PASSWORD=${APICURIO_PASSWORD}
+
   # 3. Apicurio Registry Database (PostgreSQL) - to persist schemas
   apicurio-db:
     image: postgres:14.21
     container_name: apicurio-db
     environment:
-      - POSTGRES_DB=apicurio
-      - POSTGRES_USER=apicurio
-      - POSTGRES_PASSWORD=apicurio
+      - POSTGRES_DB=${APICURIO_DB}
+      - POSTGRES_USER=${APICURIO_USER}
+      - POSTGRES_PASSWORD=${APICURIO_PASSWORD}
     volumes:
       - apicurio_db_data:/var/lib/postgresql/data
 
   # 4. Apicurio Registry UI
   apicurio-ui:
-    image: quay.io/apicurio/apicurio-registry-ui:latest
+    image: quay.io/apicurio/apicurio-registry-ui:3.1.6
     container_name: apicurio-ui
     ports:
       - "8888:8080"  # This maps YOUR 8888 to internal 8080
