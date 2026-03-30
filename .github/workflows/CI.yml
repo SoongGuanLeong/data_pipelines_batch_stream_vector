@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  lint-and-syntax:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run Ruff lint
+        run: ruff check 1-batch/docker/15_minio_spark_iceberg_polaris-postgres_kafka-connect/notebooks/src
+
+      - name: Syntax check (AST parse all Python files)
+        run: |
+          python - <<'PY'
+          import ast
+          import pathlib
+          import sys
+
+          root = pathlib.Path("1-batch/docker/15_minio_spark_iceberg_polaris-postgres_kafka-connect/notebooks/src")
+          failed = []
+
+          for p in root.rglob("*.py"):
+              try:
+                  ast.parse(p.read_text(encoding="utf-8"))
+              except Exception as e:
+                  failed.append((p, e))
+
+          if failed:
+              print(f"Syntax check failed for {len(failed)} file(s):")
+              for p, e in failed:
+                  print(f"- {p}: {e}")
+              sys.exit(1)
+
+          print("Syntax check passed.")
+          PY

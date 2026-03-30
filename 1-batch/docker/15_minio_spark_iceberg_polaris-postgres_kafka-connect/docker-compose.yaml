@@ -147,9 +147,10 @@ services:
       QUARKUS_DATASOURCE_USERNAME: ${POLARIS_USER}
       QUARKUS_DATASOURCE_PASSWORD: ${POLARIS_PASSWORD}
       POLARIS_BOOTSTRAP_CREDENTIALS: ${POLARIS_BOOTSTRAP_CREDENTIALS}
+      POLARIS_REALM: ${POLARIS_REALM}
     command:
       - "bootstrap"
-      - "--realm=POLARIS"
+      - "--realm=${POLARIS_REALM}"
       - "--credential=${POLARIS_BOOTSTRAP_CREDENTIALS}"
     restart: "no"
 
