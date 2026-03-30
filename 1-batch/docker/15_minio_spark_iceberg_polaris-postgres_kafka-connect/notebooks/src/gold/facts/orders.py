@@ -36,6 +36,20 @@ def _build_fact_orders_core(orders: DataFrame, dim_customers: DataFrame, dim_dat
     # -----------------------------
     fact = fact.join(dim_date.alias("dd"), F.to_date("o.order_delivered_customer_date") == F.col("dd.ds"), "left")
 
+    fact = fact.select(
+        F.col("o.order_id"),
+        F.col("c.customer_sk"),
+        F.col("o.customer_id"),
+        F.col("o.order_status"),
+        F.col("dp.date_sk").alias("order_purchase_date_sk"),
+        F.col("o.order_purchase_timestamp"),
+        F.col("o.order_approved_at"),
+        F.col("o.order_delivered_carrier_date"),
+        F.col("dd.date_sk").alias("order_delivered_customer_date_sk"),
+        F.col("o.order_delivered_customer_date"),
+        F.col("o.order_estimated_delivery_date"),
+    )
+
     return fact
 
 
@@ -64,7 +78,14 @@ def build_fact_orders_incremental(
 ) -> DataFrame:
 
     orders = spark.table(orders_table).join(changed_order_ids, "order_id", "inner")
-    dim_customers = spark.table(customers_table).join(changed_customer_ids, "customer_id", "inner")
+    # Include customers impacted by changed orders (not only changed customer records).
+    # Without this, an updated order for an unchanged customer can produce null customer_sk.
+    # impacted FKs = changed FKs + FKs of changed records (orders)
+    impacted_customer_ids = (
+        orders.select("customer_id").unionByName(changed_customer_ids.select("customer_id")).distinct()
+    )
+    dim_customers = spark.table(customers_table).join(impacted_customer_ids, "customer_id", "inner")
+
     dim_date = spark.table(date_table)
 
     fact = _build_fact_orders_core(orders, dim_customers, dim_date)

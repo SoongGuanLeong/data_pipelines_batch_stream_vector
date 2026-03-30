@@ -10,7 +10,7 @@ def build_dim_customers_snapshot(spark, snapshot_date: str) -> DataFrame:
     """
 
     c = spark.table("polaris.silver.customers")
-    geo = spark.table("polaris.silver.geolocations")
+    geo = spark.table("polaris.silver.geolocation")
 
     # get data upto a certain event date
     c_filtered = c.filter(F.col("cdc_ts") <= F.to_timestamp(F.lit(snapshot_date)))
