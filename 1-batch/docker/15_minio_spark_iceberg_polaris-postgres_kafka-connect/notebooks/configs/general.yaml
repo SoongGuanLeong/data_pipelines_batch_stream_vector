@@ -1,8 +1,0 @@
-project: olist
-catalog: polaris
-namespaces:
-  bronze: bronze
-  silver: silver
-  gold: gold
-  monitoring: monitoring
-bucket: olist-ecommerce
