@@ -17,6 +17,7 @@ dim_sellers_scd2:
 dim_products_scd2:
   source_table: polaris.silver.products
   target_table: polaris.gold.dim_products_scd2
+  translation_table: polaris.silver.product_category_name
   buffer_hours: 6
   key_column: product_id
 fact_orders:
