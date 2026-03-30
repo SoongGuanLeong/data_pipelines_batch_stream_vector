@@ -1,0 +1,12 @@
+1-batch/docker/shared-logs/
+
+# Python cache/artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter artifacts
+.ipynb_checkpoints/
+
+# Optional local env/tooling
+.env

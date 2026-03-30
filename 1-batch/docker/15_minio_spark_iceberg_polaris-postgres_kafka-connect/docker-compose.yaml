@@ -1,0 +1,187 @@
+# Olist Data Pipeline Engineeering: Minio + Spark + Iceberg + Polaris (1.2.0-incubating)
+# https://iceberg.apache.org/docs/latest/
+# https://hadoop.apache.org/docs/stable/hadoop-aws/
+name: olist-engineering-stack
+
+services:
+  # 1. Minio (S3 Compatible Storage) - if hardcore switch to Ceph or S3
+  minio:
+    # https://github.com/minio/minio
+    # https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/root-credentials/
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # MinIO Console
+
+  # 2. Minio Client (mc) - optional, for easier Minio management
+  mc:
+    # https://hub.docker.com/r/minio/mc
+    # tail -f /dev/null - to keep the container running
+    image: minio/mc:RELEASE.2025-08-13T08-35-41Z-cpuv1
+    container_name: minio-mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      set -e;
+
+      echo 'Waiting for MinIO...';
+      until mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}; do
+        sleep 2;
+      done;
+
+      echo 'Waiting for S3 API readiness...';
+      until mc ls local >/dev/null 2>&1; do
+        sleep 2;
+      done;
+
+      echo 'Creating bucket...';
+      mc mb --ignore-existing local/olist-ecommerce;
+
+      echo 'Buckets:';
+      mc ls local;
+
+      tail -f /dev/null
+      "
+  
+  # 3. Apache Spark - version affected by Iceberg compatibility
+  # https://iceberg.apache.org/releases/  - showed the latest jar
+  # https://iceberg.apache.org/spark-quickstart/#docker-compose  - show a docker-compose example
+  # print(spark._jvm.org.apache.hadoop.util.VersionInfo.getVersion())  - show hadoop version 
+  # https://central.sonatype.com/artifact/org.apache.hadoop/hadoop-aws/  - show 3.4.2
+  spark:
+    build:
+      context: ./spark
+      dockerfile: Dockerfile
+    container_name: spark
+    depends_on:
+      - minio
+      - polaris
+    ports:
+      - 8084:8888   # Jupyter (8081, 8082, 8083 are used)
+      - 4040:4040   # Spark UI
+      - 10000:10000 # Thrift server
+      - 10001:10001 # optional additional port
+    environment:
+      # these are added by gpt during debugging
+      SPARK_LOCAL_IP: 0.0.0.0
+      SPARK_UI_BIND_ADDRESS: 0.0.0.0
+      SPARK_UI_PORT: 4040
+      SPARK_CONF_DIR: /opt/spark/conf
+      SPARK_HOME: /opt/spark
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      # - ./warehouse:/home/iceberg/warehouse (minio have persistent volume)
+      - ./notebooks:/home/iceberg/notebooks
+      - ./spark/conf:/opt/spark/conf
+      - ../shared-logs:/opt/spark/logs
+      - ../datasets:/opt/spark/datasets
+    # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
+
+  # 4. Polaris (Iceberg REST catalog) 
+  polaris:
+    image: apache/polaris:1.2.0-incubating
+    container_name: polaris
+    ports:
+      - "8181:8181" # The API we will talk to
+      - "8182:8182" # Admin/Management
+    environment:
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      #JAVA_OPTS: -Daws.region=us-east-1
+      AWS_ENDPOINT: http://minio:9000/
+      AWS_S3_FORCE_PATH_STYLE: "true"
+      # these are needed to create token
+      POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,admin,password123
+      POLARIS_REALM: POLARIS
+      # persistence
+      POLARIS_PERSISTENCE_TYPE: relational-jdbc
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/polaris
+      QUARKUS_DATASOURCE_USERNAME: ${POLARIS_USER}
+      QUARKUS_DATASOURCE_PASSWORD: ${POLARIS_PASSWORD}
+
+  # 5. postgres for Polaris
+  postgres:
+    image: postgres:16.11-bookworm
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_DB: ${POLARIS_DB}
+      POSTGRES_USER: ${POLARIS_USER}
+      POSTGRES_PASSWORD: ${POLARIS_PASSWORD}
+    volumes:
+      - polaris_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d polaris"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 6. to init schema in polaris postgres
+  polaris-bootstrap:
+    image: apache/polaris-admin-tool:1.2.0-incubating
+    container_name: polaris-bootstrap
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      #JAVA_OPTS: -Daws.region=us-east-1
+      AWS_ENDPOINT: http://minio:9000/
+      AWS_S3_FORCE_PATH_STYLE: "true"
+      # persistence
+      POLARIS_PERSISTENCE_TYPE: relational-jdbc
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/polaris
+      QUARKUS_DATASOURCE_USERNAME: ${POLARIS_USER}
+      QUARKUS_DATASOURCE_PASSWORD: ${POLARIS_PASSWORD}
+      POLARIS_BOOTSTRAP_CREDENTIALS: ${POLARIS_BOOTSTRAP_CREDENTIALS}
+    command:
+      - "bootstrap"
+      - "--realm=POLARIS"
+      - "--credential=${POLARIS_BOOTSTRAP_CREDENTIALS}"
+    restart: "no"
+
+  # 7. kafka-connect (sink)
+  # https://docs.confluent.io/platform/current/installation/versions-interoperability.html
+  kafka-connect:
+    image: confluentinc/cp-kafka-connect:8.1.1
+    container_name: kafka-connect
+    depends_on:
+      - minio
+    ports:
+      - "8085:8085"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: "kafka:9092"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
+      CONNECT_GROUP_ID: "kafka-connect-cluster"
+      CONNECT_CONFIG_STORAGE_TOPIC: "kafka-connect-configs"
+      CONNECT_OFFSET_STORAGE_TOPIC: "kafka-connect-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "kafka-connect-status"
+      CONNECT_KEY_CONVERTER: "io.confluent.connect.avro.AvroConverter"
+      CONNECT_VALUE_CONVERTER: "io.confluent.connect.avro.AvroConverter"
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: "http://apicurio:8081/apis/ccompat/v7"
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "http://apicurio:8081/apis/ccompat/v7"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+
+networks:
+  default:
+    external: true
+    name: data-pipeline-net
+
+volumes:
+  minio_data:
+  polaris_pgdata:

@@ -1,0 +1,28 @@
+raw_folder: raw
+raw_ingestion_path: /opt/spark/datasets
+allowed_types:
+  - csv
+  - json
+  - parquet
+  - jpg
+  - png
+  - pdf
+  - txt
+
+raw_metadata_table: raw_ingestion_metadata
+lookup_metadata_table: lookup_ingestion_metadata
+
+lookup_tables:
+  geolocation:
+    schema: |
+      geolocation_zip_code_prefix STRING,
+      geolocation_lat DOUBLE,
+      geolocation_lng DOUBLE,
+      geolocation_city STRING,
+      geolocation_state STRING
+    file_path: /opt/spark/datasets/olist_geolocation_dataset.csv
+  product_category_name:
+    schema: |
+      product_category_name STRING,
+      product_category_name_english STRING
+    file_path: /opt/spark/datasets/product_category_name_translation.csv
