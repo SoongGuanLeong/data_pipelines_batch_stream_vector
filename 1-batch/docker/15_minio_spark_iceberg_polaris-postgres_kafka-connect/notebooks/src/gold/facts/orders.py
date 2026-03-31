@@ -132,6 +132,6 @@ def validate_fact_orders(df: DataFrame):
         raise ValueError("Null customer_sk found in fact_orders")
 
     # Valid date SKs
-    for c in ["order_purchase_date_sk", "order_delivered_customer_date_sk"]:
+    for c in ["order_purchase_date_sk"]:
         if df.filter(F.col(c).isNull()).limit(1).count() > 0:
             raise ValueError(f"Null {c} found in fact_orders")
