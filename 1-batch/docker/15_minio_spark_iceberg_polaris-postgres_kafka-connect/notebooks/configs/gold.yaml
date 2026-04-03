@@ -54,3 +54,11 @@ fact_order_payments:
     - order_id
     - payment_sequential
 fact_order_reviews:
+  source_table: polaris.silver.order_reviews
+  target_table: polaris.gold.fact_order_reviews
+  orders_table: polaris.silver.orders
+  customers_table: polaris.gold.dim_customers_scd2
+  date_table: polaris.gold.dim_date
+  buffer_hours: 6
+  key_columns: 
+    - review_id

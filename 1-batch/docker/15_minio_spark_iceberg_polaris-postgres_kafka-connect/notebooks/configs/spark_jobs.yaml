@@ -14,3 +14,4 @@ jobs:
   gold_orders: olist-gold-orders
   gold_order_items: olist-gold-order-items
   gold_order_payments: olist-gold-order-payments
+  gold_order_reviews: olist-gold-order-reviews
