@@ -1,4 +1,4 @@
-# Olist Data Pipeline Engineeering: Minio + Spark + Iceberg + Polaris (1.2.0-incubating)
+# Olist Data Pipeline Engineeering: Minio + Spark + Iceberg + Polaris (1.2.0-incubating) + Trino (480)
 # https://iceberg.apache.org/docs/latest/
 # https://hadoop.apache.org/docs/stable/hadoop-aws/
 name: olist-engineering-stack
@@ -109,6 +109,9 @@ services:
       QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/polaris
       QUARKUS_DATASOURCE_USERNAME: ${POLARIS_USER}
       QUARKUS_DATASOURCE_PASSWORD: ${POLARIS_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   # 5. postgres for Polaris
   postgres:
@@ -177,6 +180,19 @@ services:
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+
+    # 8. Trino (formerly PrestoSQL) - distributed SQL query engine for big data analytics
+    # https://hub.docker.com/r/trinodb/trino
+    # trino:
+    #   image: trinodb/trino:480
+    #   container_name: trino
+    #   depends_on:
+    #     - minio
+    #     - polaris
+    #   ports:
+    #     - "8080:8080"
+    #   volumes:
+    #     - ./trino/etc:/etc/trino
 
 networks:
   default:
