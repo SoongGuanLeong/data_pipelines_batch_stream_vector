@@ -1,4 +1,6 @@
 from pyspark.sql import DataFrame, SparkSession
+from typing import List
+import uuid
 
 
 # =========================================================
@@ -26,42 +28,47 @@ def replace_by_key(
     spark: SparkSession,
     df: DataFrame,
     target_table: str,
-    key_column: str,
+    key_columns: List[str],
 ) -> None:
     """
     Replace data for specific keys (DELETE + INSERT).
 
-    Pattern:
-    1. Delete existing rows for affected keys
-    2. Insert recomputed rows
-
-    Guarantees:
-    - idempotent (same input → same output)
-    - correct for SCD2
+    Production-safe version:
+    - supports composite keys
+    - safe for concurrent runs
+    - no staging table conflicts
     """
 
-    staging_table = f"{target_table}__staging"
+    staging_table = f"{target_table}_staging_{uuid.uuid4().hex}"
 
-    # write new data
-    df.write.format("iceberg").mode("overwrite").saveAsTable(staging_table)
+    try:
+        # write new data
+        df.write.format("iceberg").mode("overwrite").saveAsTable(staging_table)
 
-    # get affected keys once
-    spark.sql(f"""
-        CREATE OR REPLACE TEMP VIEW affected_keys AS
-        SELECT DISTINCT {key_column} FROM {staging_table}
-    """)
+        # dynamically build condition string
+        conditions = []
+        for col in key_columns:
+            conditions.append(f"t.{col} = s.{col}")
+        join_condition = " AND ".join(conditions)
 
-    # delete only affected keys
-    spark.sql(f"""
-        DELETE FROM {target_table}
-        WHERE {key_column} IN (SELECT {key_column} FROM affected_keys)
-    """)
+        # delete only affected keys
+        spark.sql(f"""
+            DELETE FROM {target_table} t
+            WHERE EXISTS (
+                SELECT 1
+                FROM {staging_table} s
+                WHERE {join_condition}
+            )
+        """)
 
-    # --- INSERT new data ---
-    spark.sql(f"""
-        INSERT INTO {target_table}
-        SELECT * FROM {staging_table}
-    """)
+        # --- INSERT new data ---
+        col_list = ", ".join(df.columns)
+        spark.sql(f"""
+            INSERT INTO {target_table} ({col_list})
+            SELECT {col_list} FROM {staging_table}
+        """)
+    finally:
+        spark.sql(f"DROP TABLE IF EXISTS {staging_table}")
 
 
 # =========================================================

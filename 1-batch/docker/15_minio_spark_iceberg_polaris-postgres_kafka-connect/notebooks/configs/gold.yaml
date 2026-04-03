@@ -7,26 +7,50 @@ dim_customers_scd2:
   target_table: polaris.gold.dim_customers_scd2
   geo_table: polaris.silver.geolocation
   buffer_hours: 6
-  key_column: customer_id
+  key_columns: 
+    - customer_id
 dim_sellers_scd2:
   source_table: polaris.silver.sellers
   target_table: polaris.gold.dim_sellers_scd2
   geo_table: polaris.silver.geolocation
   buffer_hours: 6
-  key_column: seller_id
+  key_columns: 
+    - seller_id
 dim_products_scd2:
   source_table: polaris.silver.products
   target_table: polaris.gold.dim_products_scd2
   translation_table: polaris.silver.product_category_name
   buffer_hours: 6
-  key_column: product_id
+  key_columns: 
+    - product_id
 fact_orders:
   source_table: polaris.silver.orders
   target_table: polaris.gold.fact_orders
   customers_table: polaris.gold.dim_customers_scd2
   date_table: polaris.gold.dim_date
   buffer_hours: 6
-  key_column: order_id
+  key_columns: 
+    - order_id
 fact_order_items:
+  source_table: polaris.silver.order_items
+  target_table: polaris.gold.fact_order_items
+  orders_table: polaris.silver.orders
+  customers_table: polaris.gold.dim_customers_scd2
+  products_table: polaris.gold.dim_products_scd2
+  sellers_table: polaris.gold.dim_sellers_scd2
+  date_table: polaris.gold.dim_date
+  buffer_hours: 6
+  key_columns: 
+    - order_id
+    - order_item_id
 fact_order_payments:
+  source_table: polaris.silver.order_payments
+  target_table: polaris.gold.fact_order_payments
+  orders_table: polaris.silver.orders
+  customers_table: polaris.gold.dim_customers_scd2
+  date_table: polaris.gold.dim_date
+  buffer_hours: 6
+  key_columns: 
+    - order_id
+    - payment_sequential
 fact_order_reviews:

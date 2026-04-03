@@ -12,3 +12,5 @@ jobs:
   gold_date: olist-gold-date
   gold_dims_bootstrap: olist-gold-dims-bootstrap
   gold_orders: olist-gold-orders
+  gold_order_items: olist-gold-order-items
+  gold_order_payments: olist-gold-order-payments

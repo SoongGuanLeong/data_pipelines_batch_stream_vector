@@ -1,15 +1,19 @@
-from .orders import (
-    build_fact_orders,
-    build_fact_orders_incremental,
-    get_changed_customer_ids,
-    get_changed_order_ids,
-    validate_fact_orders,
+from .orders import build_fact_orders, build_fact_orders_incremental, validate_fact_orders
+from .order_items import build_fact_order_items, build_fact_order_items_incremental, validate_fact_order_items
+from .order_payments import (
+    build_fact_order_payments,
+    build_fact_order_payments_incremental,
+    validate_fact_order_payments,
 )
 
 __all__ = [
     "build_fact_orders",
     "build_fact_orders_incremental",
-    "get_changed_customer_ids",
-    "get_changed_order_ids",
     "validate_fact_orders",
+    "build_fact_order_items",
+    "build_fact_order_items_incremental",
+    "validate_fact_order_items",
+    "build_fact_order_payments",
+    "build_fact_order_payments_incremental",
+    "validate_fact_order_payments",
 ]
