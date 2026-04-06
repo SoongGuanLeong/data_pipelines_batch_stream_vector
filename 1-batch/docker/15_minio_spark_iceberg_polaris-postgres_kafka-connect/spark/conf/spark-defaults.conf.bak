@@ -15,10 +15,10 @@ spark.sql.catalog.polaris.warehouse       learning_catalog
 spark.sql.defaultCatalog                  polaris
 # spark.sql.catalog.polaris.catalog         learning_catalog
 
-# Authentication (use Postman) / # Authentication (managed by ../scripts/16_polaris_bootstrap.sh)
+# Authentication (managed by ../scripts/16_polaris_bootstrap.sh)
 # https://polaris.apache.org/releases/1.2.0/getting-started/using-polaris/
 # The bootstrap script rotates/updates this value and keeps Spark ownership explicit.
-spark.sql.catalog.polaris.credential   <POLARIS_CLIENT_ID>:<POLARIS_CLIENT_SECRET>
+spark.sql.catalog.polaris.credential   e9b137cbefa34102:d574774d14436d81b4bc7fe86077eee9
 spark.sql.catalog.polaris.scope        PRINCIPAL_ROLE:ALL
 
 # S3 / Minio Config

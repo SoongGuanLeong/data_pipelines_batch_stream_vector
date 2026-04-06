@@ -181,18 +181,25 @@ services:
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
 
-    # 8. Trino (formerly PrestoSQL) - distributed SQL query engine for big data analytics
-    # https://hub.docker.com/r/trinodb/trino
-    # trino:
-    #   image: trinodb/trino:480
-    #   container_name: trino
-    #   depends_on:
-    #     - minio
-    #     - polaris
-    #   ports:
-    #     - "8080:8080"
-    #   volumes:
-    #     - ./trino/etc:/etc/trino
+    # 8. Trino (formerly PrestoSQL) - distributed SQL query engine for BI tools
+  # https://hub.docker.com/r/trinodb/trino
+  trino:
+    image: trinodb/trino:480
+    container_name: trino
+    depends_on:
+      - minio
+      - polaris
+    ports:
+      - "8080:8080"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      TRINO_POLARIS_CREDENTIAL: ${TRINO_POLARIS_CREDENTIAL:-admin:password123}
+      TRINO_POLARIS_SCOPE: ${TRINO_POLARIS_SCOPE:-PRINCIPAL_ROLE:ALL}
+      TRINO_POLARIS_WAREHOUSE: ${TRINO_POLARIS_WAREHOUSE:-learning_catalog}
+    volumes:
+      - ./trino/etc:/etc/trino
+
 
 networks:
   default:
