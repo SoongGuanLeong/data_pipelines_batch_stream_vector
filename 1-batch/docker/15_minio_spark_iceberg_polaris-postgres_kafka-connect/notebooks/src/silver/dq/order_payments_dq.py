@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame, functions as F
-from .utils import write_dq_metrics
+from src.monitoring.dq_metrics import write_dq_metrics
 
 
 def collect_order_payments_dq_metrics(df: DataFrame, table_name: str) -> DataFrame:

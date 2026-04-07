@@ -94,24 +94,30 @@ def validate_scd2_sellers(df: DataFrame) -> None:
     """
     Basic SCD2 sanity checks.
     Raises exception if invalid.
+    Return metrics dict for monitoring.dq_metrics
     """
+    metrics = {}
 
     # 1. no duplicate (seller_id, effective_from)
     dup = df.groupBy("seller_id", "effective_from").count().filter("count > 1")
-
-    if not dup.isEmpty():
+    dup_count = dup.limit(1).count()
+    metrics["duplicate_keys"] = dup_count
+    if dup_count > 0:
         raise ValueError("Duplicate SCD2 keys detected")
 
     # 2. only one current row per seller
     current = df.filter("is_current = true")
-
     dup_current = current.groupBy("seller_id").count().filter("count > 1")
-
-    if not dup_current.isEmpty():
+    dup_current_count = dup_current.limit(1).count()
+    metrics["multiple_current_rows"] = dup_current_count
+    if dup_current_count > 0:
         raise ValueError("Multiple current rows detected")
 
     # 3. effective_from < effective_to (if not null)
     invalid = df.filter((F.col("effective_to").isNotNull()) & (F.col("effective_from") >= F.col("effective_to")))
-
-    if not invalid.isEmpty():
+    invalid_count = invalid.limit(1).count()
+    metrics["invalid_intervals"] = invalid_count
+    if invalid_count > 0:
         raise ValueError("Invalid SCD2 intervals detected")
+
+    return metrics

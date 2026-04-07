@@ -104,18 +104,30 @@ def validate_fact_orders(df: DataFrame):
     """
     Basic validation for fact_orders
     """
+    metrics = {}
 
     # Unique order_id
     dup = df.groupBy("order_id").count().filter(F.col("count") > 1)
-    if not dup.isEmpty():
+    dup_count = dup.limit(1).count()
+    metrics["duplicate_keys"] = dup_count
+    if dup_count > 0:
         raise ValueError("Duplicate order_id found in fact_orders")
 
     # Non-null foreign keys
-    nulls = df.filter(F.col("customer_sk").isNull())
-    if not nulls.isEmpty():
-        raise ValueError("Null customer_sk found in fact_orders")
+    cols = ["customer_sk"]
+    for c in cols:
+        nulls = df.filter(F.col(c).isNull())
+        null_count = nulls.limit(1).count()
+        metrics[f"null_{c}"] = null_count
+        if null_count > 0:
+            raise ValueError(f"Null {c} found in fact_orders")
 
     # Non-null date SKs
     for c in ["order_purchase_date_sk"]:
-        if not df.filter(F.col(c).isNull()).isEmpty():
+        nulls = df.filter(F.col(c).isNull())
+        null_count = nulls.limit(1).count()
+        metrics[f"null_{c}"] = null_count
+        if null_count > 0:
             raise ValueError(f"Null {c} found in fact_orders")
+
+    return metrics

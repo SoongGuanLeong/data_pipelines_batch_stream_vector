@@ -10,6 +10,7 @@ from .writers import overwrite_table, replace_by_key, merge_into, overwrite_part
 
 from . import gold
 from . import silver
+from . import monitoring
 
 
 __all__ = [
@@ -36,4 +37,5 @@ __all__ = [
     "overwrite_partitions",
     "gold",
     "silver",
+    "monitoring",
 ]

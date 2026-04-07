@@ -109,23 +109,33 @@ def build_fact_order_reviews_incremental(
 # =========================================================
 # Validation
 # =========================================================
-def validate_fact_order_reviews(df: DataFrame):
+def validate_fact_order_reviews(df: DataFrame) -> dict:
     """
     Basic validation for fact_order_reviews
     """
+    metrics = {}
     # Unique review_id
     dup = df.groupBy("review_id").count().filter(F.col("count") > 1)
-    if not dup.isEmpty():
+    dup_count = dup.limit(1).count()
+    metrics["duplicate_keys"] = dup_count
+    if dup_count > 0:
         raise ValueError("Duplicate review_id found in fact_order_reviews")
 
     # Non-null foreign keys
     cols = ["customer_sk", "order_id"]
     for c in cols:
         nulls = df.filter(F.col(c).isNull())
-        if not nulls.isEmpty():
+        null_count = nulls.limit(1).count()
+        metrics[f"null_{c}"] = null_count
+        if null_count > 0:
             raise ValueError(f"Null {c} found in fact_order_reviews")
 
     # Non-null date SKs
     for c in ["review_creation_date_sk", "review_answer_date_sk"]:
-        if not df.filter(F.col(c).isNull()).isEmpty():
+        nulls = df.filter(F.col(c).isNull())
+        null_count = nulls.limit(1).count()
+        metrics[f"null_{c}"] = null_count
+        if null_count > 0:
             raise ValueError(f"Null {c} found in fact_order_reviews")
+
+    return metrics

@@ -18,7 +18,7 @@ spark.sql.defaultCatalog                  polaris
 # Authentication (managed by ../scripts/16_polaris_bootstrap.sh)
 # https://polaris.apache.org/releases/1.2.0/getting-started/using-polaris/
 # The bootstrap script rotates/updates this value and keeps Spark ownership explicit.
-spark.sql.catalog.polaris.credential   e9b137cbefa34102:d574774d14436d81b4bc7fe86077eee9
+spark.sql.catalog.polaris.credential   efc6fb4914c7d998:0f786364a1d1b81b6fcc4c2bca23f72f
 spark.sql.catalog.polaris.scope        PRINCIPAL_ROLE:ALL
 
 # S3 / Minio Config

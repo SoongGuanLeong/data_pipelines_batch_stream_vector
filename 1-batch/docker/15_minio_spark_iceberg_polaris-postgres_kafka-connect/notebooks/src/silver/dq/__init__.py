@@ -8,7 +8,6 @@ from .products_dq import collect_products_dq_metrics
 from .sellers_dq import collect_sellers_dq_metrics
 from .geolocation_dq import collect_geolocation_dq_metrics
 from .product_category_name_dq import collect_product_category_name_dq_metrics
-from .utils import write_dq_metrics
 
 
 TABLE_DQ_METRICS = {
