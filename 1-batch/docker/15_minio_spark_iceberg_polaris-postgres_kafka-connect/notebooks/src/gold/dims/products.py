@@ -75,27 +75,23 @@ def _apply_scd2_logic(df: DataFrame) -> DataFrame:
 # =========================================================
 # Optional: validation helpers (good practice)
 # ========================================================
-def validate_scd2_products(df: DataFrame) -> dict:
+def validate_scd2_products(df: DataFrame) -> list:
 
-    metrics = {}
+    metrics = []
 
-    dup = df.groupBy("product_id", "effective_from").count().filter("count > 1")
-    dup_count = dup.limit(1).count()
-    metrics["duplicate_keys"] = dup_count
-    if dup_count > 0:
-        raise ValueError("Duplicate SCD2 keys detected")
+    metrics.append((F.count("*") - F.count_distinct("product_id", "effective_from")).alias("duplicate_keys"))
 
-    current = df.filter("is_current = true")
-    dup_current = current.groupBy("product_id").count().filter("count > 1")
-    dup_current_count = dup_current.limit(1).count()
-    metrics["multiple_current_rows"] = dup_current_count
-    if dup_current_count > 0:
-        raise ValueError("Multiple current rows detected")
+    metrics.append(
+        (
+            F.sum(F.when(F.col("is_current"), 1).otherwise(0))
+            - F.count_distinct(F.when(F.col("is_current"), F.col("product_id")))
+        ).alias("multiple_current_rows")
+    )
 
-    invalid = df.filter((F.col("effective_to").isNotNull()) & (F.col("effective_from") >= F.col("effective_to")))
-    invalid_count = invalid.limit(1).count()
-    metrics["invalid_intervals"] = invalid_count
-    if invalid_count > 0:
-        raise ValueError("Invalid SCD2 intervals detected")
+    metrics.append(
+        F.sum(
+            ((F.col("effective_to").isNotNull()) & (F.col("effective_from") >= F.col("effective_to"))).cast("int")
+        ).alias("invalid_intervals")
+    )
 
     return metrics

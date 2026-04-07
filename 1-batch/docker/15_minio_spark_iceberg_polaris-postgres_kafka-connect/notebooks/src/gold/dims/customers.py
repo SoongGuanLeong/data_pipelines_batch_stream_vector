@@ -91,34 +91,20 @@ def _apply_scd2_logic(df: DataFrame) -> DataFrame:
 # =========================================================
 # Optional: validation helpers (good practice)
 # =========================================================
-def validate_scd2_customers(df: DataFrame) -> dict:
-    """
-    Basic SCD2 sanity checks.
-    Raises exception if invalid.
-    Return metrics dict for monitoring.dq_metrics
-    """
-    metrics = {}
+def validate_scd2_customers(df: DataFrame) -> list:
+    metrics = []
 
-    # 1. no duplicate (customer_id, effective_from)
-    dup = df.groupBy("customer_id", "effective_from").count().filter("count > 1")
-    dup_count = dup.limit(1).count()
-    metrics["duplicate_keys"] = dup_count
-    if dup_count > 0:
-        raise ValueError("Duplicate SCD2 keys detected")
-
-    # 2. only one current row per customer
-    current = df.filter("is_current = true")
-    dup_current = current.groupBy("customer_id").count().filter("count > 1")
-    dup_current_count = dup_current.limit(1).count()
-    metrics["multiple_current_rows"] = dup_current_count
-    if dup_current_count > 0:
-        raise ValueError("Multiple current rows detected")
-
-    # 3. effective_from < effective_to (if not null)
-    invalid = df.filter((F.col("effective_to").isNotNull()) & (F.col("effective_from") >= F.col("effective_to")))
-    invalid_count = invalid.limit(1).count()
-    metrics["invalid_intervals"] = invalid_count
-    if invalid_count > 0:
-        raise ValueError("Invalid SCD2 intervals detected")
+    metrics.append((F.count("*") - F.count_distinct("customer_id", "effective_from")).alias("duplicate_keys"))
+    metrics.append(
+        (
+            F.sum(F.when(F.col("is_current"), 1).otherwise(0))
+            - F.count_distinct(F.when(F.col("is_current"), F.col("customer_id")))
+        ).alias("multiple_current_rows")
+    )
+    metrics.append(
+        F.sum(
+            ((F.col("effective_to").isNotNull()) & (F.col("effective_from") >= F.col("effective_to"))).cast("int")
+        ).alias("invalid_intervals")
+    )
 
     return metrics

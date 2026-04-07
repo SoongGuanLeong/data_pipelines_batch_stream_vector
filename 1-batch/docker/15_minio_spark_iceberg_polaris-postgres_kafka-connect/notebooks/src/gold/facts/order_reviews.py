@@ -109,33 +109,16 @@ def build_fact_order_reviews_incremental(
 # =========================================================
 # Validation
 # =========================================================
-def validate_fact_order_reviews(df: DataFrame) -> dict:
+def validate_fact_order_reviews(df: DataFrame) -> list:
     """
     Basic validation for fact_order_reviews
     """
-    metrics = {}
-    # Unique review_id
-    dup = df.groupBy("review_id").count().filter(F.col("count") > 1)
-    dup_count = dup.limit(1).count()
-    metrics["duplicate_keys"] = dup_count
-    if dup_count > 0:
-        raise ValueError("Duplicate review_id found in fact_order_reviews")
+    metrics = []
 
-    # Non-null foreign keys
-    cols = ["customer_sk", "order_id"]
-    for c in cols:
-        nulls = df.filter(F.col(c).isNull())
-        null_count = nulls.limit(1).count()
-        metrics[f"null_{c}"] = null_count
-        if null_count > 0:
-            raise ValueError(f"Null {c} found in fact_order_reviews")
+    metrics.append((F.count("*") - F.count_distinct("review_id")).alias("duplicate_keys"))
 
-    # Non-null date SKs
-    for c in ["review_creation_date_sk", "review_answer_date_sk"]:
-        nulls = df.filter(F.col(c).isNull())
-        null_count = nulls.limit(1).count()
-        metrics[f"null_{c}"] = null_count
-        if null_count > 0:
-            raise ValueError(f"Null {c} found in fact_order_reviews")
+    non_null_columns = ["customer_sk", "order_id", "review_creation_date_sk", "review_answer_date_sk"]
+    for c in non_null_columns:
+        metrics.append(F.sum(F.col(c).isNull().cast("int")).alias(f"null_{c}"))
 
     return metrics

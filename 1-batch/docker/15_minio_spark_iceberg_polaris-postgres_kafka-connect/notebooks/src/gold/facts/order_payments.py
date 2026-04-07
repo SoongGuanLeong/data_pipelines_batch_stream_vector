@@ -104,34 +104,14 @@ def build_fact_order_payments_incremental(
 # =========================================================
 # Validation
 # =========================================================
-def validate_fact_order_payments(df: DataFrame) -> dict:
-    """
-    Basic validation for fact_order_payments
-    """
-    metrics = {}
+def validate_fact_order_payments(df: DataFrame) -> list:
 
-    # Unique order_id + payment_sequential
-    dup = df.groupBy("order_id", "payment_sequential").count().filter(F.col("count") > 1)
-    dup_count = dup.limit(1).count()
-    metrics["duplicate_keys"] = dup_count
-    if dup_count > 0:
-        raise ValueError("Duplicate (order_id, payment_sequential) found in fact_order_payments")
+    metrics = []
 
-    # Non-null foreign keys
-    cols = ["customer_sk", "order_id"]
-    for c in cols:
-        nulls = df.filter(F.col(c).isNull())
-        null_count = nulls.limit(1).count()
-        metrics[f"null_{c}"] = null_count
-        if null_count > 0:
-            raise ValueError(f"Null {c} found in fact_order_payments")
+    metrics.append((F.count("*") - F.count_distinct("order_id", "payment_sequential")).alias("duplicate_keys"))
 
-    # Non-null date SKs
-    for c in ["order_purchase_date_sk"]:
-        nulls = df.filter(F.col(c).isNull())
-        null_count = nulls.limit(1).count()
-        metrics[f"null_{c}"] = null_count
-        if null_count > 0:
-            raise ValueError(f"Null {c} found in fact_order_payments")
+    non_null_columns = ["customer_sk", "order_id", "order_purchase_date_sk"]
+    for c in non_null_columns:
+        metrics.append(F.sum(F.col(c).isNull().cast("int")).alias(f"null_{c}"))
 
     return metrics

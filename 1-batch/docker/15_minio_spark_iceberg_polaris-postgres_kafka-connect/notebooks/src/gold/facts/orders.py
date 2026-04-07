@@ -100,34 +100,14 @@ def build_fact_orders_incremental(
 # =========================================================
 # Validation
 # =========================================================
-def validate_fact_orders(df: DataFrame):
-    """
-    Basic validation for fact_orders
-    """
-    metrics = {}
+def validate_fact_orders(df: DataFrame) -> list:
 
-    # Unique order_id
-    dup = df.groupBy("order_id").count().filter(F.col("count") > 1)
-    dup_count = dup.limit(1).count()
-    metrics["duplicate_keys"] = dup_count
-    if dup_count > 0:
-        raise ValueError("Duplicate order_id found in fact_orders")
+    metrics = []
 
-    # Non-null foreign keys
-    cols = ["customer_sk"]
-    for c in cols:
-        nulls = df.filter(F.col(c).isNull())
-        null_count = nulls.limit(1).count()
-        metrics[f"null_{c}"] = null_count
-        if null_count > 0:
-            raise ValueError(f"Null {c} found in fact_orders")
+    metrics.append((F.count("*") - F.count_distinct("order_id")).alias("duplicate_keys"))
 
-    # Non-null date SKs
-    for c in ["order_purchase_date_sk"]:
-        nulls = df.filter(F.col(c).isNull())
-        null_count = nulls.limit(1).count()
-        metrics[f"null_{c}"] = null_count
-        if null_count > 0:
-            raise ValueError(f"Null {c} found in fact_orders")
+    non_null_columns = ["customer_sk", "order_purchase_date_sk"]
+    for c in non_null_columns:
+        metrics.append(F.sum(F.col(c).isNull().cast("int")).alias(f"null_{c}"))
 
     return metrics

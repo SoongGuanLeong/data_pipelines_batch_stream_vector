@@ -16,12 +16,11 @@ def write_dq_metrics(
     metric_names = F.array(*[F.lit(c) for c in metric_cols])
     metric_values = F.array(*[F.col(c) for c in metric_cols])
 
-    metrics_long = metrics_df.select(
-        F.explode(F.map_from_arrays(metric_names, metric_values)).alias("metric_name", "metric_value")
-    )
-
     metrics_long = (
-        metrics_long.withColumn("pipeline_stage", F.lit(pipeline_stage))
+        metrics_df.select(
+            F.explode(F.map_from_arrays(metric_names, metric_values)).alias("metric_name", "metric_value")
+        )
+        .withColumn("pipeline_stage", F.lit(pipeline_stage))
         .withColumn("source_table", F.lit(table_name))
         .withColumn("timestamp", F.current_timestamp())
     )
