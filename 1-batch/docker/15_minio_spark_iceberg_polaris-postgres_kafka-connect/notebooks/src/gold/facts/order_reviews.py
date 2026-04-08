@@ -1,6 +1,7 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F  # , Window as W
 from src.gold.common import build_temporal_scd2_join_condition
+from src.gold.dq import build_gold_fact_metrics, build_range_violation_metric
 
 
 # =========================================================
@@ -116,12 +117,10 @@ def validate_fact_order_reviews(df: DataFrame) -> list:
     """
     Basic validation for fact_order_reviews
     """
-    metrics = []
-
-    metrics.append((F.count("*") - F.count_distinct("review_id")).alias("duplicate_keys"))
-
-    non_null_columns = ["customer_sk", "order_id", "review_creation_date_sk", "review_answer_date_sk"]
-    for c in non_null_columns:
-        metrics.append(F.sum(F.col(c).isNull().cast("int")).alias(f"null_{c}"))
-
+    metrics = build_gold_fact_metrics(
+        df,
+        key_columns=["review_id"],
+        required_columns=["customer_sk", "order_id", "review_creation_date_sk", "review_answer_date_sk"],
+    )
+    metrics.append(build_range_violation_metric("review_score", 1, 5))
     return metrics

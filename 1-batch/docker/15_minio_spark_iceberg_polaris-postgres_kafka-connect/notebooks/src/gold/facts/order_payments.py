@@ -1,6 +1,7 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F  # , Window as W
 from src.gold.common import build_temporal_scd2_join_condition
+from src.gold.dq import build_gold_fact_metrics
 
 
 # =========================================================
@@ -108,13 +109,9 @@ def build_fact_order_payments_incremental(
 # Validation
 # =========================================================
 def validate_fact_order_payments(df: DataFrame) -> list:
-
-    metrics = []
-
-    metrics.append((F.count("*") - F.count_distinct("order_id", "payment_sequential")).alias("duplicate_keys"))
-
-    non_null_columns = ["customer_sk", "order_id", "order_purchase_date_sk"]
-    for c in non_null_columns:
-        metrics.append(F.sum(F.col(c).isNull().cast("int")).alias(f"null_{c}"))
-
-    return metrics
+    return build_gold_fact_metrics(
+        df,
+        key_columns=["order_id", "payment_sequential"],
+        required_columns=["customer_sk", "order_id", "order_purchase_date_sk"],
+        non_negative_columns=["payment_value"],
+    )
