@@ -125,3 +125,47 @@ def overwrite_partitions(
     """
 
     (df.write.format("iceberg").mode("overwrite").option("overwrite-mode", "dynamic").saveAsTable(target_table))
+
+
+# =========================================================
+# Unified writer entrypoint
+# =========================================================
+def write_table(
+    spark: SparkSession,
+    df: DataFrame,
+    target_table: str,
+    strategy: str = "replace_by_key",
+    key_columns: List[str] | None = None,
+    merge_condition: str | None = None,
+) -> None:
+    """
+    Unified writer strategy entrypoint.
+
+    Supported strategies:
+    - overwrite
+    - replace_by_key
+    - merge_into
+    - overwrite_partitions
+    """
+
+    if strategy == "overwrite":
+        overwrite_table(df, target_table)
+        return
+
+    if strategy == "replace_by_key":
+        if not key_columns:
+            raise ValueError("key_columns is required when strategy='replace_by_key'")
+        replace_by_key(spark, df, target_table, key_columns)
+        return
+
+    if strategy == "merge_into":
+        if not merge_condition:
+            raise ValueError("merge_condition is required when strategy='merge_into'")
+        merge_into(spark, df, target_table, merge_condition)
+        return
+
+    if strategy == "overwrite_partitions":
+        overwrite_partitions(df, target_table)
+        return
+
+    raise ValueError(f"Unsupported write strategy: {strategy}")

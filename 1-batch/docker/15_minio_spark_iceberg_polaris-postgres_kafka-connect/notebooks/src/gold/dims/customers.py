@@ -1,5 +1,6 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F, Window as W
+from src.gold.common import apply_scd2
 
 
 # =========================================================
@@ -28,7 +29,7 @@ def _build_dim_customers_core(customers: DataFrame, geolocation: DataFrame) -> D
             F.col("c.spark_ingest_ts"),
         )
     )
-    return _apply_scd2_logic(df)
+    return apply_scd2(df, business_key="customer_id", surrogate_key="customer_sk")
 
 
 # =========================================================
@@ -58,34 +59,6 @@ def build_incremental_dim_customers(
     customers = spark.table(customers_table).join(changed_customer_ids, "customer_id", "inner")
     geo = spark.table(geolocation_table)
     return _build_dim_customers_core(customers, geo)
-
-
-# =========================================================
-# Shared SCD2 logic
-# =========================================================
-def _apply_scd2_logic(df: DataFrame) -> DataFrame:
-    """
-    Apply SCD2 window logic.
-
-    Assumptions:
-    - cdc_ts is business event time
-    - spark_ingest_ts is tie-breaker
-    """
-
-    w = W.partitionBy("customer_id").orderBy(F.col("cdc_ts"), F.col("spark_ingest_ts"))
-
-    df = (
-        df.withColumn("effective_from", F.col("cdc_ts"))
-        .withColumn("effective_to", F.lead("cdc_ts").over(w))
-        .withColumn("is_current", F.col("effective_to").isNull())
-    )
-
-    df = df.withColumn(
-        "customer_sk",
-        F.sha2(F.concat_ws("||", F.col("customer_id"), F.col("effective_from")), 256),
-    )
-
-    return df
 
 
 # =========================================================

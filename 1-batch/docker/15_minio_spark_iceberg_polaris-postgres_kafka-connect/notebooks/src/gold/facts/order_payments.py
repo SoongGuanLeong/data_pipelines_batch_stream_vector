@@ -1,5 +1,6 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F  # , Window as W
+from src.gold.common import build_temporal_scd2_join_condition
 
 
 # =========================================================
@@ -19,10 +20,12 @@ def _build_fact_order_payments_core(
     fact = op.join(o, "order_id", "left")
     fact = fact.join(
         c,
-        (
-            (F.col("o.customer_id") == F.col("c.customer_id"))
-            & (F.col("o.order_purchase_timestamp") >= F.col("c.effective_from"))
-            & ((F.col("o.order_purchase_timestamp") < F.col("c.effective_to")) | F.col("c.effective_to").isNull())
+        build_temporal_scd2_join_condition(
+            fact_key=F.col("o.customer_id"),
+            dim_key=F.col("c.customer_id"),
+            fact_event_ts=F.col("o.order_purchase_timestamp"),
+            dim_effective_from=F.col("c.effective_from"),
+            dim_effective_to=F.col("c.effective_to"),
         ),
         "left",
     )

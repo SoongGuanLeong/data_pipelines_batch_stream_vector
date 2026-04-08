@@ -1,5 +1,6 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F  # , Window as W
+from src.gold.common import build_temporal_scd2_join_condition
 
 
 # =========================================================
@@ -28,28 +29,34 @@ def _build_fact_order_items_core(
     fact = oi.join(o, "order_id", "left")
     fact = fact.join(
         c,
-        (
-            (F.col("o.customer_id") == F.col("c.customer_id"))
-            & (F.col("o.order_purchase_timestamp") >= F.col("c.effective_from"))
-            & ((F.col("o.order_purchase_timestamp") < F.col("c.effective_to")) | F.col("c.effective_to").isNull())
+        build_temporal_scd2_join_condition(
+            fact_key=F.col("o.customer_id"),
+            dim_key=F.col("c.customer_id"),
+            fact_event_ts=F.col("o.order_purchase_timestamp"),
+            dim_effective_from=F.col("c.effective_from"),
+            dim_effective_to=F.col("c.effective_to"),
         ),
         "left",
     )
     fact = fact.join(
         s,
-        (
-            (F.col("oi.seller_id") == F.col("s.seller_id"))
-            & (F.col("o.order_purchase_timestamp") >= F.col("s.effective_from"))
-            & ((F.col("o.order_purchase_timestamp") < F.col("s.effective_to")) | F.col("s.effective_to").isNull())
+        build_temporal_scd2_join_condition(
+            fact_key=F.col("oi.seller_id"),
+            dim_key=F.col("s.seller_id"),
+            fact_event_ts=F.col("o.order_purchase_timestamp"),
+            dim_effective_from=F.col("s.effective_from"),
+            dim_effective_to=F.col("s.effective_to"),
         ),
         "left",
     )
     fact = fact.join(
         p,
-        (
-            (F.col("oi.product_id") == F.col("p.product_id"))
-            & (F.col("o.order_purchase_timestamp") >= F.col("p.effective_from"))
-            & ((F.col("o.order_purchase_timestamp") < F.col("p.effective_to")) | F.col("p.effective_to").isNull())
+        build_temporal_scd2_join_condition(
+            fact_key=F.col("oi.product_id"),
+            dim_key=F.col("p.product_id"),
+            fact_event_ts=F.col("o.order_purchase_timestamp"),
+            dim_effective_from=F.col("p.effective_from"),
+            dim_effective_to=F.col("p.effective_to"),
         ),
         "left",
     )

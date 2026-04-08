@@ -1,5 +1,6 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F, Window as W
+from src.gold.common import apply_scd2
 
 
 # =========================================================
@@ -25,7 +26,7 @@ def _build_dim_products_core(products: DataFrame, translation: DataFrame) -> Dat
         "p.cdc_ts",
         "p.spark_ingest_ts",
     )
-    return _apply_scd2_logic(df)
+    return apply_scd2(df, business_key="product_id", surrogate_key="product_sk")
 
 
 # =========================================================
@@ -52,24 +53,6 @@ def build_incremental_dim_products(
     translation = spark.table(translation_table)
 
     return _build_dim_products_core(products, translation)
-
-
-# =========================================================
-# Shared SCD2 logic
-# =========================================================
-def _apply_scd2_logic(df: DataFrame) -> DataFrame:
-
-    w = W.partitionBy("product_id").orderBy(F.col("cdc_ts").asc(), F.col("spark_ingest_ts").asc())
-
-    df = (
-        df.withColumn("effective_from", F.col("cdc_ts"))
-        .withColumn("effective_to", F.lead("cdc_ts").over(w))
-        .withColumn("is_current", F.col("effective_to").isNull())
-    )
-
-    df = df.withColumn("product_sk", F.sha2(F.concat_ws("||", F.col("product_id"), F.col("effective_from")), 256))
-
-    return df
 
 
 # =========================================================
