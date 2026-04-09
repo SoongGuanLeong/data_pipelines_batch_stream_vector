@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql import functions as F, Window as W
+from pyspark.sql import functions as F  # Window as W
 from src.gold.common import apply_scd2
 
 
