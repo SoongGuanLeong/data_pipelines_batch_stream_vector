@@ -1,3 +1,7 @@
+> **Note**: This document recorded the steps taken during dev phase, particularly when figuring out how to deploy a debezium connector into debezium by following the documentation.
+> Everything below is already automated by the Alpine curl service in the ingestion docker compose.
+
+
 # POST connector 101
 
 These are just some notes I wrote while first exploring CDC with & without Apicurio registry. Feel free to skip this part and just use the [script 12](../../connectors/12_deploy.sh) provided if not interested.
@@ -54,8 +58,8 @@ docker exec -it kafka \
   --from-beginning
 ```
 #### Option 2 - AKHQ
-![AKHQ-main](AKHQ-main.png)
-![AKHQ-topic](AKHQ-topic.png)
+![AKHQ-main](images/AKHQ-main.png)
+![AKHQ-topic](images/AKHQ-topic.png)
 0 - earliest
 e - end
 . - current
@@ -70,13 +74,13 @@ kafka "op":
 - "u" means update
 - "d" means delete
 
-![customers](customers.png)
-![orders](orders.png)
-![products](products.png)
-![sellers](sellers.png)
-![order_items](order_items.png)
-![order_payments](order_payments.png)
-![order_reviews](order_reviews.png)
+![customers](images/customers.png)
+![orders](images/orders.png)
+![products](images/products.png)
+![sellers](images/sellers.png)
+![order_items](images/order_items.png)
+![order_payments](images/order_payments.png)
+![order_reviews](images/order_reviews.png)
 
 
 #### 8. update connector to include SMT
@@ -115,5 +119,5 @@ curl -X POST http://localhost:8083/connectors/olist-postgres/restart
 - repeat [step 3](#3---verify-status)
 - pick and redo one cdc test in [step 6](#6---test-cdc-for-all-tables)
 - messages produced should be a lot shorter now
-![before_unwrapped](before_unwrapped.png)
-![after_unwrapped](after_unwrapped.png)
+![before_unwrapped](images/before_unwrapped.png)
+![after_unwrapped](images/after_unwrapped.png)

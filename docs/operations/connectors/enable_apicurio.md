@@ -1,3 +1,6 @@
+> **Note**: This document recorded the steps taken during dev phase, particularly when figuring out how to add apicurio schema registry into debezium by following the documentation.
+> Everything below is already automated by the Alpine curl service in the ingestion docker compose.
+
 #### 1. uncomment these lines in [docker compose](../../docker/10_debezium_kafka_apicurio_akhq/docker-compose.yaml)
 
 ```yaml
@@ -40,16 +43,16 @@ curl http://localhost:8083/connectors/olist-postgres/status
 
 #### 4. rerun everything in [test cdc](../../scripts/13_test_cdc.sql)
 - in AKHQ, make sure all new messages in all topics become binary (non human-readable)
-![binary](binary.png)
+![binary](images/binary.png)
 - in Apicurio Registry UI, check
   - topic-key: has only PK
-  ![key](key.png)
+  ![key](images/key.png)
   - topic-value: all columns of the table
-  ![value](value.png)
+  ![value](images/value.png)
 
 #### 5. Schema Evolution test
 - run one [schema change test](../../scripts/14_test_schema_evolution.sql)
 - new column should appear in the registry
-![v2](v2.png)
-![schema_change](schema_change.png)
+![v2](images/v2.png)
+![schema_change](images/schema_change.png)
 - even if we drop the column afterwards, registry still remembers it as v2 history

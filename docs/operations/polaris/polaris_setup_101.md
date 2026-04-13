@@ -1,3 +1,6 @@
+> **Note**: This document recorded the steps taken during dev phase, particularly when figuring out how to use Polaris Management API by following the documentation.
+> Everything below is already automated by the script 16.
+
 # Polaris Setup 101
 
 This doc record my learning experience of using Postman with polaris management API. If you are not interested, you can just use [this script](../../scripts/16_polaris_bootstrap.sh) generated which serves the same purpose.
@@ -7,15 +10,15 @@ This doc record my learning experience of using Postman with polaris management 
 ### 2 - Get Polaris API link
 - Go to [polaris docs](https://polaris.apache.org/)
 - Click on [Management API](https://polaris.apache.org/in-dev/unreleased/polaris-api-specs/polaris-management-api/)
-![Polaris_Management_API_loc](Polaris_Management_API_loc.png)
+![Polaris_Management_API_loc](images/Polaris_Management_API_loc.png)
 - Get the link shown
-![API_yml_link](API_yml_link.png)
+![API_yml_link](images/API_yml_link.png)
 - Open Postman ➡️ Import ➡️ Paste the link you copied
-![Import_Polaris_API_yml](Import_Polaris_API_yml.png)
+![Import_Polaris_API_yml](images/Import_Polaris_API_yml.png)
 - ```Polaris Management Service``` ➡️ ```Variables```
   - ```scheme: http```
   - ```host: localhost:8181```
-![Set_base_url](Set_base_url.png)
+![Set_base_url](images/Set_base_url.png)
 
 ### 3 - [Connect Using REST APIs (token)](https://polaris.apache.org/releases/1.1.0/getting-started/using-polaris/#connecting-using-rest-apis)
 - **Warning**: Deprecated. This step 3 should be replaced with [Keycloak](https://hub.docker.com/r/keycloak/keycloak) in the future.
@@ -33,7 +36,7 @@ This doc record my learning experience of using Postman with polaris management 
         - ```scope: PRINCIPAL_ROLE:ALL```
     - Hit **Send**. The token is temporary and expires in 1 hour. Hit **Save** so we can reuse this request-access-token collection again.
     - Hit **Save Response** and rename as example-response
-  ![Get_Access_Token](Get_Access_Token.png)
+  ![Get_Access_Token](images/Get_Access_Token.png)
 
 ### 4 - [Role-based Access Control RBAC](https://polaris.apache.org/releases/1.2.0/managing-security/access-control/)
 #### Create Catalog
@@ -66,7 +69,7 @@ This doc record my learning experience of using Postman with polaris management 
   - **Expected Result**: ```201 Created```
   - Hit **Save AS** and rename as create-Catalog-S3
   - Hit **Save Response** and rename as example-response
-![create_catalog](create_catalog.png)
+![create_catalog](images/create_catalog.png)
 
 #### Create Principal
 - ```Polaris Management Service``` ➡️ ```principals``` ➡️ ```POST create Principal``` (Spark user)
@@ -87,7 +90,7 @@ This doc record my learning experience of using Postman with polaris management 
   - **Expected Result**: ```201 Created```
   - Hit **Save as** and rename as create-Principal-Spark
   - Hit **Save Response** and rename as example-response (**IMPORTANT**: we need ```clientId``` and ```clientSecret``` to be put into [spark-defaults.conf](../docker/17_minio_spark_iceberg_polaris/spark/conf/spark-defaults.conf))
-![Create_Principal](Create_Principal.png)
+![Create_Principal](images/Create_Principal.png)
 
 #### Principal Role
 - bridge between principal and catalog
@@ -111,7 +114,7 @@ This doc record my learning experience of using Postman with polaris management 
 - **Expected Result**: ```201 Created```
 - Hit **Save as** and rename as create-Principal-Role-Spark-Role
 - Hit **Save Response** and rename as example-response
-![Create_Principal_Role](Create_Principal_Role.png)
+![Create_Principal_Role](images/Create_Principal_Role.png)
 
 ##### Link User to Role
 - ```Polaris Management Service``` ➡️ ```principals``` ➡️ ```{principalName}``` ➡️ ```principal-roles``` ➡️ ```PUT assign Principal Role```
@@ -127,7 +130,7 @@ This doc record my learning experience of using Postman with polaris management 
   ```
 - **Expected Result**: ```201 Created``` (no response)
 - Hit **Save as** and rename as assign-Principal-Role-Spark-Role
-![Assign_Principal_Role](Assign_Principal_Role.png)
+![Assign_Principal_Role](images/Assign_Principal_Role.png)
 
 ##### Grant Access to Principal Role
 - ```Polaris Management Service``` ➡️ ```principal-roles``` ➡️ ```{principalRoleName}``` ➡️ ```catalog-roles``` ➡️ ```{catalogName}``` ➡️ ```PUT assign Catalog Role To Principal Role```
@@ -144,7 +147,7 @@ This doc record my learning experience of using Postman with polaris management 
   ```
 - **Expected Result**: ```201 Created``` (no response)
 - Hit **Save as** and rename as assign-Catalog-Role-To-Principal-Role-catalog-admin
-![Grant_access](Grant_access.png)
+![Grant_access](images/Grant_access.png)
 
 ### 5 - Final Polaris Setup Check
 - ```Polaris Management Service``` ➡️ ```principal-roles``` ➡️ ```{principalRoleName}``` ➡️ ```catalog-roles``` ➡️ ```{catalogName}``` ➡️ ```Get list Catalog Role For Principal Role```
