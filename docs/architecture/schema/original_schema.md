@@ -130,10 +130,10 @@ erDiagram
 | **Partial Index**                    | Index a subset of rows, e.g., `WHERE status='active'`     | Medium        | Saves space and improves query performance for filtered queries    |
 
 - some slides from this [video](https://www.youtube.com/watch?v=_HG2eB27j00)
-![B-Tree-1](B-Tree-1.png)
-![B-Tree-2](B-Tree-2.png)
-![GIN-1](GIN-1.png)
-![GIN-2](GIN-2.png)
-![GIN-3](GIN-3.png)
-![BRIN-1](BRIN-1.png)
-![BRIN-2](BRIN-2.png)
+![B-Tree-1](../images/B-Tree-1.png)
+![B-Tree-2](../images/B-Tree-2.png)
+![GIN-1](../images/GIN-1.png)
+![GIN-2](../images/GIN-2.png)
+![GIN-3](../images/GIN-3.png)
+![BRIN-1](../images/BRIN-1.png)
+![BRIN-2](../images/BRIN-2.png)

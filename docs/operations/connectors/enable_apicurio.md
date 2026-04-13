@@ -40,16 +40,16 @@ curl http://localhost:8083/connectors/olist-postgres/status
 
 #### 4. rerun everything in [test cdc](../../scripts/13_test_cdc.sql)
 - in AKHQ, make sure all new messages in all topics become binary (non human-readable)
-![binary](../../scripts/binary.png)
+![binary](binary.png)
 - in Apicurio Registry UI, check
   - topic-key: has only PK
-  ![key](../../scripts/key.png)
+  ![key](key.png)
   - topic-value: all columns of the table
-  ![value](../../scripts/value.png)
+  ![value](value.png)
 
 #### 5. Schema Evolution test
 - run one [schema change test](../../scripts/14_test_schema_evolution.sql)
 - new column should appear in the registry
-![v2](../../scripts/v2.png)
-![schema_change](../../scripts/schema_change.png)
+![v2](v2.png)
+![schema_change](schema_change.png)
 - even if we drop the column afterwards, registry still remembers it as v2 history
