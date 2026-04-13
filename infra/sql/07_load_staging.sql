@@ -4,12 +4,12 @@
 -- Usage (with Makefile):
 -- make load-staging DATASET_DIR=/absolute/path/to/1-batch/dataset
 
--- If dataset_dir is not passed, default to <current_working_directory>/docker/dataset.
+-- If dataset_dir is not passed, default to <current_working_directory>/data/raw/olist.
 -- assuming project root is where Makefile is located
 \if :{?dataset_dir}
 \else
 \getenv dataset_dir PWD
-\set dataset_dir :dataset_dir '/docker/dataset'
+\set dataset_dir :dataset_dir '/data/raw/olist'
 \endif
 
 \echo Using dataset_dir= :dataset_dir

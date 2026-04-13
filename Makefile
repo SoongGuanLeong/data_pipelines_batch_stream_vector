@@ -9,11 +9,7 @@ DB_HOST ?= localhost
 DB_PORT ?= 5432
 
 # Folder that contains olist_*.csv files
-DATASET_DIR ?= $(CURDIR)/docker/datasets
-
-# Docker/Compose settings for CDC stack
-DOCKER_COMPOSE ?= docker compose
-COMPOSE_FILE ?= docker/11_debezium_kafka_apicurio_akhq/docker-compose.yaml
+DATASET_DIR ?= $(CURDIR)/data/raw/olist
 
 PSQL ?= psql
 PSQL_FLAGS ?= -v ON_ERROR_STOP=1
@@ -55,25 +51,25 @@ help:
 	@echo "  test-cdc            - Test if CDC is working"
 	@echo ""
 	@echo "Variables (override like: make setup-postgres DB_USER=postgres DATASET_DIR=/path/to/csvs):"
-	@echo "  DB_USER, DB_NAME, DB_HOST, DB_PORT, DATASET_DIR, DOCKER_COMPOSE, COMPOSE_FILE, PSQL, PSQL_FLAGS"
+	@echo "  DB_USER, DB_NAME, DB_HOST, DB_PORT, DATASET_DIR, PSQL, PSQL_FLAGS"
 
 check-tools:
 	@command -v "$(PSQL)" >/dev/null 2>&1 || (echo "Required tool not found: $(PSQL)" && exit 1)
 	@command -v docker >/dev/null 2>&1 || (echo "Required tool not found: docker" && exit 1)
 
 check-sql:
-	@test -f scripts/01_init_db.sh || (echo "Missing file: scripts/01_init_db.sh" && exit 1)
-	@test -f scripts/02_create_schema.sql || (echo "Missing file: scripts/02_create_schema.sql" && exit 1)
-	@test -f scripts/03_create_tables.sql || (echo "Missing file: scripts/03_create_tables.sql" && exit 1)
-	@test -f scripts/04_add_FKs.sql || (echo "Missing file: scripts/04_add_FKs.sql" && exit 1)
-	@test -f scripts/05_add_indexes.sql || (echo "Missing file: scripts/05_add_indexes.sql" && exit 1)
-	@test -f scripts/06_create_staging.sql || (echo "Missing file: scripts/06_create_staging.sql" && exit 1)
-	@test -f scripts/07_load_staging.sql || (echo "Missing file: scripts/07_load_staging.sql" && exit 1)
-	@test -f scripts/08_load_tables.sql || (echo "Missing file: scripts/08_load_tables.sql" && exit 1)
-	@test -f scripts/09_create_publication.sql || (echo "Missing file: scripts/09_create_publication.sql" && exit 1)
-	@test -f scripts/10_prep_cdc.sql || (echo "Missing file: scripts/10_prep_cdc.sql" && exit 1)
-	@test -f scripts/13_test_cdc.sql || (echo "Missing file: scripts/13_test_cdc.sql" && exit 1)
-	@test -f scripts/14_test_schema_evolution.sql || (echo "Missing file: scripts/14_test_schema_evolution.sql" && exit 1)
+	@test -f infra/bootstrap/01_init_db.sh || (echo "Missing file: infra/bootstrap/01_init_db.sh" && exit 1)
+	@test -f infra/sql/02_create_schema.sql || (echo "Missing file: infra/sql/02_create_schema.sql" && exit 1)
+	@test -f infra/sql/03_create_tables.sql || (echo "Missing file: infra/sql/03_create_tables.sql" && exit 1)
+	@test -f infra/sql/04_add_FKs.sql || (echo "Missing file: infra/sql/04_add_FKs.sql" && exit 1)
+	@test -f infra/sql/05_add_indexes.sql || (echo "Missing file: infra/sql/05_add_indexes.sql" && exit 1)
+	@test -f infra/sql/06_create_staging.sql || (echo "Missing file: infra/sql/06_create_staging.sql" && exit 1)
+	@test -f infra/sql/07_load_staging.sql || (echo "Missing file: infra/sql/07_load_staging.sql" && exit 1)
+	@test -f infra/sql/08_load_tables.sql || (echo "Missing file: infra/sql/08_load_tables.sql" && exit 1)
+	@test -f infra/sql/09_create_publication.sql || (echo "Missing file: infra/sql/09_create_publication.sql" && exit 1)
+	@test -f infra/sql/10_prep_cdc.sql || (echo "Missing file: infra/sql/10_prep_cdc.sql" && exit 1)
+	@test -f infra/sql/13_test_cdc.sql || (echo "Missing file: infra/sql/13_test_cdc.sql" && exit 1)
+	@test -f infra/sql/14_test_schema_evolution.sql || (echo "Missing file: infra/sql/14_test_schema_evolution.sql" && exit 1)
 
 check-dataset:
 	@test -d "$(DATASET_DIR)" || (echo "DATASET_DIR does not exist: $(DATASET_DIR)" && exit 1)
@@ -82,38 +78,38 @@ check-dataset:
 	done
 
 init-db:
-	@DB_USER="$(DB_USER)" DB_NAME="$(DB_NAME)" bash scripts/01_init_db.sh
+	@DB_USER="$(DB_USER)" DB_NAME="$(DB_NAME)" bash infra/bootstrap/01_init_db.sh
 
 create-schema:
-	$(PSQL_DB) -f scripts/02_create_schema.sql
+	$(PSQL_DB) -f infra/sql/02_create_schema.sql
 
 create-tables:
-	$(PSQL_DB) -f scripts/03_create_tables.sql
+	$(PSQL_DB) -f infra/sql/03_create_tables.sql
 
 add-fks:
-	$(PSQL_DB) -f scripts/04_add_FKs.sql
+	$(PSQL_DB) -f infra/sql/04_add_FKs.sql
 
 add-indexes:
-	$(PSQL_DB) -f scripts/05_add_indexes.sql
+	$(PSQL_DB) -f infra/sql/05_add_indexes.sql
 
 create-staging:
-	$(PSQL_DB) -f scripts/06_create_staging.sql
+	$(PSQL_DB) -f infra/sql/06_create_staging.sql
 
 load-staging:
 	@test -d "$(DATASET_DIR)" || (echo "DATASET_DIR does not exist: $(DATASET_DIR)" && exit 1)
-	$(PSQL_DB) -v dataset_dir="$(DATASET_DIR)" -f scripts/07_load_staging.sql
+	$(PSQL_DB) -v dataset_dir="$(DATASET_DIR)" -f infra/sql/07_load_staging.sql
 
 load-tables:
-	$(PSQL_DB) -f scripts/08_load_tables.sql
+	$(PSQL_DB) -f infra/sql/08_load_tables.sql
 
 create-publication:
-	$(PSQL_DB) -f scripts/09_create_publication.sql
+	$(PSQL_DB) -f infra/sql/09_create_publication.sql
 
 prep-cdc:
-	$(PSQL_DB) -f scripts/10_prep_cdc.sql
+	$(PSQL_DB) -f infra/sql/10_prep_cdc.sql
 
 setup-postgres: check-tools check-sql check-dataset init-db create-schema create-tables add-fks add-indexes create-staging load-staging load-tables create-publication prep-cdc
 	@echo "Postgres setup complete."
 
 test-cdc:
-	$(PSQL_DB) -f scripts/13_test_cdc.sql -f scripts/14_test_schema_evolution.sql
+	$(PSQL_DB) -f infra/sql/13_test_cdc.sql -f infra/sql/14_test_schema_evolution.sql

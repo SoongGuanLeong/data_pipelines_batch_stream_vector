@@ -52,18 +52,18 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
 
 Assumption: PostgreSQL is already installed and running on your local machine.
 
-1. Clone this repo. Put the Olist CSV files under `1-batch/docker/datasets/` (default), or pass a custom `DATASET_DIR`.
+1. Clone this repo. Put the Olist CSV files under `data/raw/olist` (default), or pass a custom `DATASET_DIR`.
 2. Export your PostgreSQL password so `psql` can connect non-interactively:
    ```bash
    export PGPASSWORD='your_postgres_password'
    ```
-3. cd into the path where [Makefile](./1-batch/Makefile) is located. Run the postgres bootstrap:
+3. cd into the path where [Makefile](./Makefile) is located. Run the postgres bootstrap:
    ```bash
    make setup-postgres DB_USER=postgres DB_NAME=olist DB_HOST=localhost DB_PORT=5432
    ```
-4. cd into the path where ingestion stack [docker-compose.yaml](./1-batch/docker/11_debezium_kafka_apicurio_akhq/docker-compose.yaml) is located, then run the docker container. Refer [this link](https://github.com/SoongGuanLeong/docker-beginner-tutorial-followalong) for commonly used docker commands.
+4. cd into the path where ingestion stack [docker-compose.yaml](infra/docker/cdc_stack/docker-compose.yaml) is located, then run the docker container. Refer [this link](https://github.com/SoongGuanLeong/docker-beginner-tutorial-followalong) for commonly used docker commands.
    ```bash
-   cd docker/11_debezium_kafka_apicurio_akhq
+   cd infra/docker/cdc_stack
    docker network create data-pipeline-net
    docker compose up -d
    ```
@@ -75,7 +75,7 @@ Assumption: PostgreSQL is already installed and running on your local machine.
 
 Useful overrides:
 ```bash
-make load-staging DATASET_DIR=/absolute/path/to/1-batch/docker/datasets DB_USER=postgres DB_NAME=olist
+make load-staging DATASET_DIR=/absolute/path/to/data/raw/olist DB_USER=postgres DB_NAME=olist
 ```
-If `DATASET_DIR` is omitted, `07_load_staging.sql` will default to `$PWD/1-batch/docker/datasets`.
+If `DATASET_DIR` is omitted, `07_load_staging.sql` will default to `$PWD/data/raw/olist`.
 
