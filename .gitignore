@@ -14,3 +14,6 @@ __pycache__/
 # Optional local env/tooling
 .env
 *.env
+
+# Ignore datasets (if you want to keep them out of git)
+data/
