@@ -11,7 +11,7 @@ While processing over 10 TB of data per day remains costly and uncommon, such la
 - vector db pipeline
 
 ## Batch Pipeline (Lakehouse - Micro batch)
-![ETL_pipeline](<docs\architecture\images\ETL_pipeline.png>)
+![ETL_pipeline](docs/architecture/images/ETL_pipeline.png)
 
 OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attempting iceberg kafka sink connector)
 
