@@ -81,10 +81,10 @@ services:
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
     volumes:
       # - ./warehouse:/home/iceberg/warehouse (minio have persistent volume)
-      - ./notebooks:/home/iceberg/notebooks
+      - ../../../notebooks:/home/iceberg/notebooks
       - ./spark/conf:/opt/spark/conf
       - ../shared-logs:/opt/spark/logs
-      - ../datasets:/opt/spark/datasets
+      - ../../../data:/opt/spark/data
     # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
 
   # 4. Polaris (Iceberg REST catalog) 
