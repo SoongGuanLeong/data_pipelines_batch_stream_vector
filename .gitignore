@@ -1,4 +1,4 @@
-1-batch/docker/shared-logs/
+infra/docker/shared-logs/
 
 # Python cache/artifacts
 __pycache__/
