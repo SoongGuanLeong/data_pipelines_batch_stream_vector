@@ -30,7 +30,8 @@ REQUIRED_CSVS := \
 .PHONY: help check-tools check-sql check-dataset \
 	init-db create-schema create-tables add-fks add-indexes create-staging load-staging \
 	load-tables create-publication prep-cdc setup-postgres \
-	test-cdc
+	test-cdc \
+	init-polaris
 
 help:
 	@echo "Available targets:"
@@ -49,6 +50,7 @@ help:
 	@echo "  prep-cdc            - Prepare postgres for CDC"
 	@echo "  setup-postgres      - Run postgres setup in correct order"
 	@echo "  test-cdc            - Test if CDC is working"
+	@echo "  init-polaris		 - Run Polaris bootstrap script"
 	@echo ""
 	@echo "Variables (override like: make setup-postgres DB_USER=postgres DATASET_DIR=/path/to/csvs):"
 	@echo "  DB_USER, DB_NAME, DB_HOST, DB_PORT, DATASET_DIR, PSQL, PSQL_FLAGS"
@@ -70,6 +72,7 @@ check-sql:
 	@test -f infra/sql/10_prep_cdc.sql || (echo "Missing file: infra/sql/10_prep_cdc.sql" && exit 1)
 	@test -f infra/sql/13_test_cdc.sql || (echo "Missing file: infra/sql/13_test_cdc.sql" && exit 1)
 	@test -f infra/sql/14_test_schema_evolution.sql || (echo "Missing file: infra/sql/14_test_schema_evolution.sql" && exit 1)
+	@test -f infra/bootstrap/16_polaris_bootstrap.sh || (echo "Missing file: infra/bootstrap/16_polaris_bootstrap.sh" && exit 1)
 
 check-dataset:
 	@test -d "$(DATASET_DIR)" || (echo "DATASET_DIR does not exist: $(DATASET_DIR)" && exit 1)
@@ -113,3 +116,6 @@ setup-postgres: check-tools check-sql check-dataset init-db create-schema create
 
 test-cdc:
 	$(PSQL_DB) -f infra/sql/13_test_cdc.sql -f infra/sql/14_test_schema_evolution.sql
+
+init-polaris:
+	bash infra/bootstrap/16_polaris_bootstrap.sh

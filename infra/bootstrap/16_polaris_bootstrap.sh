@@ -22,7 +22,7 @@ REALM="${POLARIS_REALM:-POLARIS}"
 PRINCIPAL_NAME="${POLARIS_PRINCIPAL_NAME:-spark_user}"
 ROLE_NAME="${POLARIS_ROLE_NAME:-spark_role}"
 CATALOG_ROLE="${POLARIS_CATALOG_ROLE:-catalog_admin}"
-SPARK_DEFAULTS_PATH="${SPARK_DEFAULTS_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../docker/15_minio_spark_iceberg_polaris-postgres_kafka-connect/spark/conf" && pwd)/spark-defaults.conf}"
+SPARK_DEFAULTS_PATH="${SPARK_DEFAULTS_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../docker/lakehouse_stack/spark/conf" && pwd)/spark-defaults.conf}"
 
 # ==============================================================
 # Helpers

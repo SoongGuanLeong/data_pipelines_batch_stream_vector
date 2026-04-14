@@ -54,28 +54,39 @@ Assumption: PostgreSQL is already installed and running on your local machine.
 
 1. Clone this repo. Put the Olist CSV files under `data/raw/olist` (default), or pass a custom `DATASET_DIR`.
 2. Export your PostgreSQL password so `psql` can connect non-interactively:
-   ```bash
-   export PGPASSWORD='your_postgres_password'
-   ```
+    ```bash
+    export PGPASSWORD='your_postgres_password'
+    ```
 3. cd into the path where [Makefile](./Makefile) is located. Run the postgres bootstrap:
-   ```bash
-   make setup-postgres DB_USER=postgres DB_NAME=olist DB_HOST=localhost DB_PORT=5432
-   ```
-4. cd into the path where ingestion stack [docker-compose.yaml](infra/docker/cdc_stack/docker-compose.yaml) is located, then run the docker container. Refer [this link](https://github.com/SoongGuanLeong/docker-beginner-tutorial-followalong) for commonly used docker commands.
-   ```bash
-   cd infra/docker/cdc_stack
-   docker network create data-pipeline-net
-   docker compose up -d
-   ```
+    ```bash
+    make setup-postgres DB_USER=postgres DB_NAME=olist DB_HOST=localhost DB_PORT=5432
+    ```
+4. cd into the path where cdc stack [docker-compose.yaml](infra/docker/cdc_stack/docker-compose.yaml) is located, then run the docker container. Refer [this link](https://github.com/SoongGuanLeong/docker-beginner-tutorial-followalong) for commonly used docker commands.
+    ```bash
+    cd infra/docker/cdc_stack
+    docker network create data-pipeline-net
+    docker compose up -d
+    ```
 
 5. Test if CDC is working. Check at AKHQ UI if there is new messages that come in after we run the test:
+    ```bash
+    cd ../../..
+    make test-cdc
+    ```
+6. cd into the path where lakehouse stack [docker-compose.yaml](infra/docker/lakehouse_stack/docker-compose.yaml) is located, then run the docker container.
+    ```bash
+    cd infra/docker/lakehouse_stack
+    docker compose up -d --build
+    ```
+
+7. Run [16_polaris_bootstrap.sh](infra/bootstrap/16_polaris_bootstrap.sh) using the make command below. It will setup the minimal access needed by Polaris and automatically fill the ID and SECRET into [spark-defaults.conf](infra\docker\lakehouse_stack\spark\conf\spark-defaults.conf). 
    ```bash
-   make test-cdc
+   cd ../../..
+   make init-polaris
    ```
-
-Useful overrides:
-```bash
-make load-staging DATASET_DIR=/absolute/path/to/data/raw/olist DB_USER=postgres DB_NAME=olist
-```
-If `DATASET_DIR` is omitted, `07_load_staging.sql` will default to `$PWD/data/raw/olist`.
-
+8. Restart spark and get the log. Get the token from the terminal output and use it to log into spark at [localhost.](http://localhost:8084/)
+   ```bash
+   cd infra/docker/lakehouse_stack
+   docker compose restart spark
+   docker compose logs spark
+   ```

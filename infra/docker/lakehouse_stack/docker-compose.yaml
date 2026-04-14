@@ -79,12 +79,16 @@ services:
       AWS_REGION: us-east-1
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      PYTHONPATH: /opt/project
+    working_dir: /opt/project
     volumes:
       # - ./warehouse:/home/iceberg/warehouse (minio have persistent volume)
       - ../../../notebooks:/home/iceberg/notebooks
       - ./spark/conf:/opt/spark/conf
       - ../shared-logs:/opt/spark/logs
       - ../../../data:/opt/spark/data
+      - ../../../src:/opt/project/src
+      - ../../../configs:/opt/project/configs
     # https://iceberg.apache.org/spark-quickstart/#adding-iceberg-to-spark
 
   # 4. Polaris (Iceberg REST catalog) 
