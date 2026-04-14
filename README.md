@@ -92,4 +92,4 @@ Assumption: PostgreSQL is already installed and running on your local machine.
    docker compose restart spark
    docker compose logs spark
    ```
-   Use the token to log in at http://localhost:8084/
+   - Use the token to log in at http://localhost:8084/
