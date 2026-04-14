@@ -16,4 +16,5 @@ __pycache__/
 *.env
 
 # Ignore datasets (if you want to keep them out of git)
-data/raw/olist/
+data/raw/olist/*
+!data/raw/.gitkeep
