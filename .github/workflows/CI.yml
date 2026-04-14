@@ -23,7 +23,7 @@ jobs:
         run: pip install ruff
 
       - name: Run Ruff lint
-        run: ruff check 1-batch/docker/15_minio_spark_iceberg_polaris-postgres_kafka-connect/notebooks/src
+        run: ruff check src
 
       - name: Syntax check (AST parse all Python files)
         run: |
@@ -32,7 +32,7 @@ jobs:
           import pathlib
           import sys
 
-          root = pathlib.Path("1-batch/docker/15_minio_spark_iceberg_polaris-postgres_kafka-connect/notebooks/src")
+          root = pathlib.Path("src")
           failed = []
 
           for p in root.rglob("*.py"):
