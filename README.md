@@ -48,8 +48,7 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
 
 #### ELK Stack - Logging and Monitoring tool
 
-### Quickstart (Local PostgreSQL + Makefile)
-
+### Quickstart
 Assumption: PostgreSQL is already installed and running on your local machine.
 
 1. Clone repo + add dataset
