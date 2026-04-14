@@ -52,41 +52,44 @@ OLTP (postgresql) → Debezium → Kafka + Apicurio + AKHQ → Minio → (attemp
 
 Assumption: PostgreSQL is already installed and running on your local machine.
 
-1. Clone this repo. Put the Olist CSV files under `data/raw/olist` (default), or pass a custom `DATASET_DIR`.
-2. Export your PostgreSQL password so `psql` can connect non-interactively:
+1. Clone repo + add dataset
+   - Place Olist CSVs in ```data/raw/olist``` (or set ```DATASET_DIR```).
+2. Set PostgreSQL password
     ```bash
     export PGPASSWORD='your_postgres_password'
     ```
-3. cd into the path where [Makefile](./Makefile) is located. Run the postgres bootstrap:
+3. Initialize PostgreSQL
     ```bash
     make setup-postgres DB_USER=postgres DB_NAME=olist DB_HOST=localhost DB_PORT=5432
     ```
-4. cd into the path where cdc stack [docker-compose.yaml](infra/docker/cdc_stack/docker-compose.yaml) is located, then run the docker container. Refer [this link](https://github.com/SoongGuanLeong/docker-beginner-tutorial-followalong) for commonly used docker commands.
+4. Start CDC stack
     ```bash
     cd infra/docker/cdc_stack
     docker network create data-pipeline-net
     docker compose up -d
     ```
 
-5. Test if CDC is working. Check at AKHQ UI if there is new messages that come in after we run the test:
+5. Validate CDC
     ```bash
     cd ../../..
     make test-cdc
     ```
-6. cd into the path where lakehouse stack [docker-compose.yaml](infra/docker/lakehouse_stack/docker-compose.yaml) is located, then run the docker container.
+6. Start lakehouse stack
     ```bash
     cd infra/docker/lakehouse_stack
     docker compose up -d --build
     ```
 
-7. Run [16_polaris_bootstrap.sh](infra/bootstrap/16_polaris_bootstrap.sh) using the make command below. It will setup the minimal access needed by Polaris and automatically fill the ID and SECRET into [spark-defaults.conf](infra\docker\lakehouse_stack\spark\conf\spark-defaults.conf). 
+7. Initialize Polaris
    ```bash
    cd ../../..
    make init-polaris
    ```
-8. Restart spark and get the log. Get the token from the terminal output and use it to log into spark at [localhost.](http://localhost:8084/)
+   - Spark credentials would be auto-configured.
+8. Restart Spark + get access token
    ```bash
    cd infra/docker/lakehouse_stack
    docker compose restart spark
    docker compose logs spark
    ```
+   Use the token to log in at http://localhost:8084/
