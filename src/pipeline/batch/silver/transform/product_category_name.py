@@ -1,7 +1,7 @@
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
-from src.transform_utils import (
+from src.pipeline.batch.common.transform_utils import (
     flatten_structs,
     normalize_column_names,
     remove_control_characters,

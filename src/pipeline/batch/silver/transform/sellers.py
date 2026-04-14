@@ -1,7 +1,7 @@
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
-from src.transform_utils import (
+from src.pipeline.batch.common.transform_utils import (
     flatten_structs,
     normalize_column_names,
     remove_control_characters,
@@ -25,9 +25,7 @@ def transform_sellers(df: DataFrame) -> DataFrame:
         df = df.withColumn(c, F.trim(F.col(c)))
 
     df = df.dropna(subset=["seller_id"])
-    df = df.fillna(
-        "N/A", subset=["seller_zip_code_prefix", "seller_city", "seller_state"]
-    )
+    df = df.fillna("N/A", subset=["seller_zip_code_prefix", "seller_city", "seller_state"])
 
     df = df.withColumn("seller_city", F.initcap(F.col("seller_city"))).withColumn(
         "seller_state", F.upper(F.col("seller_state"))

@@ -1,7 +1,7 @@
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
-from src.transform_utils import (
+from src.pipeline.batch.common.transform_utils import (
     flatten_structs,
     normalize_column_names,
     remove_control_characters,
@@ -35,9 +35,7 @@ def transform_order_payments(df: DataFrame) -> DataFrame:
     ]
     df = df.withColumn(
         "payment_type",
-        F.when(
-            F.col("payment_type").isin(VALID_PAYMENT_TYPES), F.col("payment_type")
-        ).otherwise("N/A"),
+        F.when(F.col("payment_type").isin(VALID_PAYMENT_TYPES), F.col("payment_type")).otherwise("N/A"),
     )
 
     # Numeric - not null (dropna/fillna), defensive casting, range check, precision

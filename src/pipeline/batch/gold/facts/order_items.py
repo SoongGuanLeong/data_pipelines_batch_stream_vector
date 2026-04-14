@@ -1,7 +1,7 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F  # , Window as W
-from src.gold.common import build_temporal_scd2_join_condition
-from src.gold.dq import build_gold_fact_metrics
+from src.pipeline.batch.gold.scd2 import build_temporal_scd2_join_condition
+from src.pipeline.batch.gold.dq import build_gold_fact_metrics
 
 
 # =========================================================

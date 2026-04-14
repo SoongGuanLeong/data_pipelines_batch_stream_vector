@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame, functions as F
-from src.monitoring.dq_metrics import write_dq_metrics
+from src.pipeline.batch.monitoring.dq_metrics import write_dq_metrics
 
 
 def collect_customers_dq_metrics(df: DataFrame, table_name: str) -> DataFrame:

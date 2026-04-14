@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame, SparkSession
-from src.watermark import get_changed_keys
+from src.pipeline.batch.common.watermark import get_changed_keys
 
 
 def get_changed_order_ids(spark: SparkSession, effective_ts) -> DataFrame:
