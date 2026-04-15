@@ -1,5 +1,5 @@
 raw_folder: raw
-raw_ingestion_path: /opt/spark/datasets
+raw_ingestion_path: /opt/spark/data/raw/olist
 allowed_types:
   - csv
   - json
@@ -20,9 +20,9 @@ lookup_tables:
       geolocation_lng DOUBLE,
       geolocation_city STRING,
       geolocation_state STRING
-    file_path: /opt/spark/datasets/olist_geolocation_dataset.csv
+    file_path: /opt/spark/data/raw/olist/olist_geolocation_dataset.csv
   product_category_name:
     schema: |
       product_category_name STRING,
       product_category_name_english STRING
-    file_path: /opt/spark/datasets/product_category_name_translation.csv
+    file_path: /opt/spark/data/raw/olist/product_category_name_translation.csv
