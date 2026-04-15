@@ -2,7 +2,7 @@ import yaml
 from pathlib import Path
 
 
-def load_config(folder="configs/batch"):
+def load_config(folder="../../configs/batch"):
     config = {}
     folder_path = Path(folder)
     for file in folder_path.glob("*.yaml"):
